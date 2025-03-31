@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GoudaChatbotApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+11ca044f5895b9802d05bc657f97f7ee62a8621c")]
 [assembly: System.Reflection.AssemblyProductAttribute("GoudaChatbotApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GoudaChatbotApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

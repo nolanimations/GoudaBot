@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework> <!-- Or your target framework -->
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <FrontendProjectDirectory>$(MSBuildProjectDirectory)/../gouda-chatbot-frontend</FrontendProjectDirectory>
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,5 +12,31 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.0" />
   </ItemGroup>
+
+  <!-- Add this entire Target section -->
+  <Target Name="BuildAndIncludeFrontend" BeforeTargets="ComputeFilesToPublish">
+    <!-- This target runs *before* dotnet determines which files to include in the publish output -->
+
+    <!-- Step 1: Log a message -->
+    <Message Text="Starting frontend build..." Importance="high" />
+
+    <!-- Step 2: Run npm install in the frontend directory -->
+    <!-- Only run if node_modules doesn't exist or package.json is newer -->
+    <Exec Command="npm install" WorkingDirectory="$(FrontendProjectDirectory)" Condition="!Exists('$(FrontendProjectDirectory)/node_modules')" />
+
+    <!-- Step 3: Run npm run build -->
+    <Exec Command="npm run build" WorkingDirectory="$(FrontendProjectDirectory)" />
+
+    <!-- Step 4: Copy build output (dist folder contents) to wwwroot in publish directory -->
+    <ItemGroup>
+      <!-- Define the files to copy from the frontend dist folder -->
+      <FrontendDistFiles Include="$(FrontendProjectDirectory)/dist/**" />
+    </ItemGroup>
+    <!-- Copy the files, preserving directory structure, into the wwwroot subfolder of the publish directory -->
+    <Copy SourceFiles="@(FrontendDistFiles)" DestinationFolder="$(PublishDir)/wwwroot/%(RecursiveDir)" SkipUnchangedFiles="true" />
+
+    <Message Text="Frontend build completed and files copied to $(PublishDir)/wwwroot/" Importance="high" />
+  </Target>
+  <!-- End of added Target section -->
 
 </Project>

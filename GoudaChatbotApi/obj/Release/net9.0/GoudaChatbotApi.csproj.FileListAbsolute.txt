@@ -35,3 +35,16 @@ C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\obj\Release\net9.0\refint\Goud
 C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\obj\Release\net9.0\GoudaChatbotApi.pdb
 C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\obj\Release\net9.0\GoudaChatbotApi.genruntimeconfig.cache
 C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\obj\Release\net9.0\ref\GoudaChatbotApi.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatBotApi\obj\Release\net9.0\GoudaChatbotApi.sourcelink.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\web.config
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\appsettings.Development.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\appsettings.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\GoudaChatbotApi.deps.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\GoudaChatbotApi.runtimeconfig.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\GoudaChatbotApi.staticwebassets.endpoints.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\publish_output\web.config
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\publish_output\appsettings.Development.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\publish_output\appsettings.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\publish_output\GoudaChatbotApi.deps.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\publish_output\GoudaChatbotApi.runtimeconfig.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish_output\publish_output\GoudaChatbotApi.staticwebassets.endpoints.json
