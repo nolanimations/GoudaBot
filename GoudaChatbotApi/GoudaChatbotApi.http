@@ -1,0 +1,6 @@
+@GoudaChatbotApi_HostAddress = http://localhost:5227
+
+GET {{GoudaChatbotApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

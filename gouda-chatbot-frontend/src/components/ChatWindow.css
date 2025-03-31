@@ -1,0 +1,12 @@
+.chat-window {
+    flex-grow: 1; /* Take available vertical space */
+    overflow-y: auto; /* Enable scrolling */
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background-color: var(--background-chatbox);
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Spacing between messages */
+  }

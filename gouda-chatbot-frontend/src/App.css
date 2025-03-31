@@ -1,0 +1,30 @@
+.app-container {
+  background-color: var(--background-secondary);
+  border-radius: 8px;
+  padding: 25px 35px;
+  width: 100%;
+  max-width: 850px; /* Max width */
+  height: 90vh; /* Max height relative to viewport */
+  max-height: 900px; /* Absolute max height */
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  overflow: hidden; /* Prevent content spillover */
+}
+
+h1 {
+  text-align: center;
+  color: var(--text-light);
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 1.6em;
+}
+
+.error-message {
+    color: var(--error-color);
+    text-align: center;
+    padding: 5px 0;
+    font-size: 0.9em;
+    min-height: 20px; /* Reserve space */
+}

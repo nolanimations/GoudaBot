@@ -1,0 +1,4 @@
+{
+    "appService.preDeployTask": "publish-release",
+    "appService.deploySubpath": "GoudaChatbotApi/bin/Release/net9.0/publish"
+}

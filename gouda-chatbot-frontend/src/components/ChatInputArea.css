@@ -1,0 +1,64 @@
+.input-area {
+    display: flex;
+    align-items: flex-end; /* Align items to bottom for multi-line text area */
+    padding: 8px 12px; /* Slightly less padding */
+    background-color: var(--background-tertiary);
+    border-radius: 24px; /* Rounded input area */
+    margin-top: auto; /* Push to bottom */
+  }
+  
+  .input-area textarea {
+    flex-grow: 1;
+    background-color: transparent;
+    border: none;
+    color: var(--text-primary);
+    padding: 10px 5px; /* Padding inside textarea */
+    resize: none; /* Disable manual resize */
+    overflow-y: auto; /* Allow scrolling if text overflows max-height */
+    max-height: 100px; /* Limit height (should match JS logic) */
+    outline: none; /* Remove focus outline */
+    font-family: inherit;
+    font-size: 1em;
+    line-height: 1.4;
+    margin-right: 8px; /* Space between textarea and button */
+  }
+  
+  .input-area textarea::placeholder {
+      color: var(--text-secondary);
+  }
+  
+  .input-area textarea:disabled {
+      cursor: not-allowed;
+  }
+  
+  
+  .send-button {
+    background-color: var(--button-bg);
+    color: var(--text-light); /* Icon color */
+    border: none;
+    border-radius: 50%; /* Circular button */
+    width: 40px;
+    height: 40px;
+    min-width: 40px; /* Prevent shrinking */
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.2s ease;
+    padding: 0; /* Remove default padding */
+  }
+  
+  .send-button:hover:not(:disabled) {
+    background-color: var(--button-hover-bg);
+  }
+  
+  .send-button:disabled {
+    background-color: var(--button-disabled-bg);
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .send-button svg {
+    /* Adjust SVG position slightly if needed */
+    /* transform: translateX(1px); */
+  }

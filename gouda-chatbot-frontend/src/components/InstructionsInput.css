@@ -1,0 +1,39 @@
+.instructions-container {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: var(--background-tertiary);
+    border-radius: 5px;
+  }
+  
+  .instructions-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+  }
+  
+  .instructions-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--background-input);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color-input);
+    border-radius: 4px;
+    padding: 8px 10px;
+    font-family: inherit;
+    font-size: 0.95em;
+    resize: vertical;
+    min-height: 40px; /* Minimum height */
+    max-height: 100px; /* Prevent excessive height */
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  
+  .instructions-container textarea:focus {
+    border-color: var(--user-message-bg);
+  }
+  
+  .instructions-container textarea:disabled {
+      background-color: var(--button-disabled-bg);
+      cursor: not-allowed;
+  }

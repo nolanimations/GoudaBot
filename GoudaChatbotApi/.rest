@@ -1,0 +1,69 @@
+# REST Client file to test the GoudaChatbotApi streaming endpoint.
+# Make sure the REST Client extension (humao.rest-client) is installed in VS Code.
+# Ensure the backend API is running before sending requests.
+
+# --- Configuration ---
+# !!! IMPORTANT: Update this URL to match the one your C# backend is running on !!!
+# (Check the output when you run `dotnet run` or start debugging)
+@baseUrl = http://localhost:5227
+# You can change this ID to test different conversation sessions
+@sessionId = rest-client-test-session-abcde
+
+### Send Chat Message and Stream Response
+# Click the "Send Request" CodeLens link that appears above this line.
+# The response will show the raw SSE stream in the results pane.
+# Look for lines starting with "data:".
+
+# @name SendInitialMessage
+POST {{baseUrl}}/api/chat
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "sessionId": "{{sessionId}}",
+  "message": "Hallo! Vertel me over de activiteiten in het Goudse Hout.",
+  "customInstructions": "Wees vriendelijk en informatief. Geef een korte samenvatting."
+}
+
+### Send Follow-up Message (Same Session)
+# This tests if the conversation history is working.
+# Use the same @sessionId as the request above.
+
+# @name SendFollowUp
+POST {{baseUrl}}/api/chat
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "sessionId": "{{sessionId}}",
+  "message": "Zijn er daar ook speelplekken voor kinderen?",
+  "customInstructions": "Wees vriendelijk en informatief. Geef een korte samenvatting."
+}
+
+### Send Message in a New Session (Different ID)
+# Use a different sessionId to simulate a new user/conversation.
+
+# @name SendNewSession
+POST {{baseUrl}}/api/chat
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "sessionId": "rest-client-new-session-12345",
+  "message": "Ik zoek revalidatie opties na een beroerte in Gouda.",
+  "customInstructions": null // Test without specific instructions (will use default)
+}
+
+### Send Message with Different Custom Instructions (Same Session as first)
+# This tests overriding/using different instructions within the same session ID.
+
+# @name SendWithModifiedInstructions
+POST {{baseUrl}}/api/chat
+Content-Type: application/json
+Accept: text/event-stream
+
+{
+  "sessionId": "{{sessionId}}", // Same session ID as the first request
+  "message": "Wat is het telefoonnummer van de kinderboerderij daar?",
+  "customInstructions": "Antwoord alleen met het telefoonnummer indien beschikbaar, anders zeg 'niet gevonden'."
+}

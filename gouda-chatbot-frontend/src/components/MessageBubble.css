@@ -1,0 +1,167 @@
+/* --- Base Bubble Styles --- */
+.message-bubble {
+    /* REDUCED vertical padding */
+    padding: 8px 15px; /* Was 10px 15px */
+    border-radius: 18px;
+    max-width: 80%;
+    line-height: 1.45; /* Keep line-height for readability */
+    word-wrap: break-word;
+    position: relative;
+    color: var(--text-primary);
+  }
+  
+  .user-message {
+    background-color: var(--user-message-bg);
+    color: var(--text-light);
+    margin-left: auto;
+    border-bottom-right-radius: 5px;
+  }
+  
+  .bot-message {
+    background-color: var(--bot-message-bg);
+    color: var(--text-primary);
+    margin-right: auto;
+    border-bottom-left-radius: 5px;
+  }
+  
+  /* --- Markdown Content Styling (Applied directly within .message-bubble) --- */
+  
+  /* Reduce paragraph margins for less vertical space */
+  .message-bubble p:first-child {
+     margin-top: 0;
+  }
+  .message-bubble p:last-child {
+     margin-bottom: 0;
+  }
+  .message-bubble p {
+      margin-top: 0.3em;  /* REDUCED - Was 0.5em */
+      margin-bottom: 0.3em; /* REDUCED - Was 0.5em */
+  }
+  
+  /* Headings (keep relatively compact) */
+  .message-bubble h1,
+  .message-bubble h2,
+  .message-bubble h3,
+  .message-bubble h4,
+  .message-bubble h5,
+  .message-bubble h6 {
+    margin-top: 0.6em;    /* Slightly reduced */
+    margin-bottom: 0.3em; /* Slightly reduced */
+    line-height: 1.3;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.2em;
+    color: inherit;
+  }
+  .message-bubble h1 { font-size: 1.25em; } /* Slightly smaller */
+  .message-bubble h2 { font-size: 1.15em; } /* Slightly smaller */
+  .message-bubble h3 { font-size: 1.05em; } /* Slightly smaller */
+  .message-bubble h4, .message-bubble h5, .message-bubble h6 { font-size: 1em; }
+  
+  /* Lists (reduce margins slightly) */
+  .message-bubble ul,
+  .message-bubble ol {
+    padding-left: 25px;
+    margin-top: 0.3em;    /* REDUCED */
+    margin-bottom: 0.3em; /* REDUCED */
+    color: inherit;
+  }
+  .message-bubble li {
+    margin-bottom: 0.2em; /* Reduced */
+  }
+  .message-bubble li > p {
+      margin-bottom: 0.1em; /* Reduced */
+  }
+  
+  /* Code blocks (reduce margins slightly) */
+  .message-bubble pre {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 8px 12px; /* Slightly reduced padding */
+    margin: 0.6em 0;   /* REDUCED */
+    overflow-x: auto;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    border: 1px solid var(--border-color);
+    white-space: pre;
+    color: inherit;
+  }
+  /* Inline code */
+  .message-bubble code {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    padding: 0.15em 0.4em;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    font-size: 0.9em;
+    color: inherit;
+  }
+  .message-bubble pre code {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    font-size: inherit;
+    border: none;
+    white-space: pre-wrap;
+  }
+  
+  /* Blockquotes (reduce margins slightly) */
+  .message-bubble blockquote {
+    border-left: 3px solid var(--button-bg);
+    padding-left: 15px;
+    margin: 0.6em 0; /* REDUCED */
+    color: var(--text-secondary);
+    font-style: italic;
+  }
+  .message-bubble blockquote p {
+      margin-bottom: 0;
+  }
+  
+  /* Links */
+  .message-bubble a {
+    color: #8ab4f8;
+    text-decoration: none;
+  }
+  .message-bubble a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Horizontal Rules */
+  .message-bubble hr {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 0.8em 0; /* Reduced */
+  }
+  
+  /* Tables */
+  .message-bubble table {
+    border-collapse: collapse;
+    margin: 0.8em 0; /* Reduced */
+    width: auto;
+    border: 1px solid var(--border-color);
+    color: inherit;
+  }
+  .message-bubble th,
+  .message-bubble td {
+    border: 1px solid var(--border-color);
+    padding: 5px 8px; /* Reduced padding */
+    text-align: left;
+  }
+  .message-bubble th {
+    background-color: rgba(0, 0, 0, 0.1);
+    font-weight: 600;
+  }
+  
+  /* --- Blinking Cursor for Streaming --- */
+  .message-bubble.streaming::after {
+    content: '▋';
+    display: inline-block;
+    animation: blink 1s step-start infinite;
+    margin-left: 3px;
+    vertical-align: baseline;
+    color: inherit;
+    font-weight: 300;
+  }
+  
+  @keyframes blink {
+    50% { opacity: 0; }
+  }

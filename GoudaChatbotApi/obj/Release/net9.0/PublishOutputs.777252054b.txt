@@ -1,0 +1,13 @@
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\GoudaChatbotApi.exe
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\appsettings.Development.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\appsettings.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\GoudaChatbotApi.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\GoudaChatbotApi.deps.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\GoudaChatbotApi.runtimeconfig.json
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\GoudaChatbotApi.pdb
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\OpenAI.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\Microsoft.AspNetCore.OpenApi.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\Microsoft.OpenApi.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\Swashbuckle.AspNetCore.Swagger.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\Swashbuckle.AspNetCore.SwaggerGen.dll
+C:\Users\Nolan\Documents\GoudaBot\GoudaChatbotApi\bin\Release\net9.0\publish\Swashbuckle.AspNetCore.SwaggerUI.dll
