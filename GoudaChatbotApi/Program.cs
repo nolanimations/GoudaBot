@@ -76,9 +76,9 @@ else // Production environment settings
 
 // --- Add Static File Serving ---
 // UseDefaultFiles must come BEFORE UseStaticFiles to serve index.html for directory root requests.
-app.UseDefaultFiles();
+// app.UseDefaultFiles();
 // UseStaticFiles serves files from wwwroot by default. Ensure your React build output is in wwwroot.
-app.UseStaticFiles();
+// app.UseStaticFiles();
 // --- End Static File Serving ---
 
 app.UseRouting();
@@ -95,7 +95,7 @@ app.MapControllers(); // Maps attribute-routed API controllers (e.g., /api/chat/
 // This MUST come AFTER API endpoint mapping (MapControllers).
 // It ensures that any request that doesn't match a static file or an API route
 // will be served the index.html file, allowing React Router to handle the client-side routing.
-app.MapFallbackToFile("index.html");
+// app.MapFallbackToFile("index.html");
 // --- End SPA Fallback Routing ---
 
 app.Run();
