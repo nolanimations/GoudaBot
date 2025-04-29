@@ -5,7 +5,7 @@
 # --- Configuration ---
 # !!! IMPORTANT: Update this URL to match the one your C# backend is running on !!!
 # (Check the output when you run `dotnet run` or start debugging)
-@baseUrl = http://localhost:5227
+@baseUrl = http://127.0.0.1:5227
 # You can change this ID to test different conversation sessions
 @sessionId = rest-client-test-session-abcde
 

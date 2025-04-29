@@ -1,4 +1,5 @@
 import openai
+from dotenv import load_dotenv
 from threading import Lock
 
 # In-memory session manager (thread-safe)
@@ -27,6 +28,7 @@ class ChatSession:
 
 class ChatService:
     def __init__(self, openai_api_key):
+        load_dotenv()
         openai.api_key = openai_api_key
 
     async def stream_chat_completion_chunks_async(self, request):
