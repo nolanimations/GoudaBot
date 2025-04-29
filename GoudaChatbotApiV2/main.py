@@ -1,18 +1,10 @@
-from fastapi import FastAPI
-from Controllers.ChatController import chatController
+from flask import Flask
+from Controllers.ChatController import chat_controller
 
-class Main:
-    def run(self):
-        app = FastAPI()
-        app.include_router(chatController, prefix="/api/chat")
-
-
-
-
-
+app = Flask(__name__)
+app.register_blueprint(chat_controller)
 
 
 if __name__ == "__main__":
-    import uvicorn
     # Run the app on localhost:5227
-    uvicorn.run("main:app", host="127.0.0.1", port=5227, reload=True)
+    app.run(host="127.0.0.1", port=5227, debug=True)

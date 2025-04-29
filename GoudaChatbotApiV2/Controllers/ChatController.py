@@ -1,8 +1,10 @@
-from fastapi import APIRouter
-from Models.ChatRequest import ChatRequest
-from openai import *
+from flask import Blueprint, request, jsonify, Response
+import uuid
 
-chatController = APIRouter()
+chat_controller = Blueprint('chat_controller', __name__, url_prefix='/api/chat')
+
+# In-memory cache for stream contexts (for demo purposes)
+stream_context_cache = {}
 
 class StreamContext:
     def __init__(self, session_id: str, user_message: str, custom_instructions: str = None):
@@ -10,14 +12,10 @@ class StreamContext:
         self.user_message = user_message
         self.custom_instructions = custom_instructions
 
+@chat_controller.route('/initiate', methods=['POST'])
+def initiate_chat_stream():
+    print("WIP!")
 
-
-@chatController.post("initiate")
-async def initiate_chatStream(request: ChatRequest): 
-    print("initiate")
-
-
-
-@chatController.get("/stream/{stream_id}")
-async def get_chat_stream(stream_id: str):
+@chat_controller.route('/stream/<stream_id>', methods=['GET'])
+def get_chat_stream(stream_id):
     print("WIP!")
