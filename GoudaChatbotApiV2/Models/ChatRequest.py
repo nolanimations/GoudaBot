@@ -3,4 +3,3 @@ class ChatRequest:
         self.session_id = session_id
         self.message = message
         self.custom_instructions = custom_instructions
-        
