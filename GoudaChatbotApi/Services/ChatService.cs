@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using OpenAI;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Globalization;
 
 namespace GoudaChatbotApi.Services
 {
@@ -20,6 +21,8 @@ namespace GoudaChatbotApi.Services
     {
         private readonly OpenAIService _openAiService;
         private readonly ILogger<ChatService> _logger;
+
+        
 
         public ChatService(IOptions<OpenAiOptions> openAiOptions, ILogger<ChatService> logger)
         {
