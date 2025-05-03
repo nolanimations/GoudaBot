@@ -1,5 +1,0 @@
-{
-    "appService.preDeployTask": "publish-release",
-    "appService.deploySubpath": "GoudaChatbotApi\\bin\\Release\\net9.0\\publish",
-    "appService.defaultWebAppToDeploy": "/subscriptions/7093e9ae-68b0-4152-993f-a50bea874cf6/resourceGroups/goudabot/providers/Microsoft.Web/sites/goudabot"
-}
