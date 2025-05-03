@@ -1,7 +1,6 @@
-# requirements.txt
 Flask
 Flask-Cors
 Flask-Caching
-openai>=1.0.0 # Use >=1.0.0 because we use the new client syntax
-python-dotenv # For local .env loading
-gunicorn      # Production WSGI server needed for Azure App Service
+openai>=1.0.0
+python-dotenv
+gunicorn
