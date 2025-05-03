@@ -4,7 +4,7 @@ from flask_caching import Cache
 
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173", "https://goudabot.azurewebsites.net"], supports_credentials=True)
+CORS(app, origins=["http://localhost:5173", "https://goudabot2.azurewebsites.net"], supports_credentials=True)
 
 # Simple in-memory cache (for production, use 'redis' or 'memcached')
 app.config['CACHE_TYPE'] = 'SimpleCache'
