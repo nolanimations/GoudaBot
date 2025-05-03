@@ -124,18 +124,10 @@ function App() {
       eventSourceRef.current.onopen = () => console.log("EventSource connection established.");
 
       eventSourceRef.current.onmessage = (event) => {
-        const newData = event.data; // The new chunk received
-        console.log("SSE onmessage received data:", newData);
-
-        // Update the text ref (still useful for finalizeStream)
-        currentStreamTextRef.current += newData;
-
-        // Update the display state by APPENDING the new data to the PREVIOUS state's text
-        setStreamingMessageDisplay(prev => {
-            // Ensure prev is not null if events arrive super fast before initial state set
-            const currentText = prev?.text ?? '';
-            return { ...prev, text: currentText + newData };
-        });
+        // Update the text ref directly
+        currentStreamTextRef.current += event.data;
+        // Update the display state for rendering
+        setStreamingMessageDisplay(prev => ({ ...prev, text: currentStreamTextRef.current }));
       };
 
       eventSourceRef.current.addEventListener('close', (event) => {
