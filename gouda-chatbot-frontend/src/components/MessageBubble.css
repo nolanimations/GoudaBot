@@ -152,6 +152,7 @@
   }
   
   /* --- Blinking Cursor for Streaming --- */
+  /*
   .message-bubble.streaming::after {
     content: '▋';
     display: inline-block;
@@ -165,3 +166,5 @@
   @keyframes blink {
     50% { opacity: 0; }
   }
+  
+    */
