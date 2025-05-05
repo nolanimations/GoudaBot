@@ -27,13 +27,22 @@ function App() {
 
   // *** 2. Create the stable throttled function using useRef ***
   const throttledSetStreamingDisplayText = useRef(
-      throttle((newText) => {
-          // Update display state with the full accumulated text, but only periodically
-          // We still need the ID here to ensure the component renders
-          setStreamingMessageDisplay(prev => ({ ...prev, id: currentStreamIdRef.current, text: newText, sender: 'bot' }));
-          console.log(`Throttled Update - Text Length: ${newText?.length ?? 0}`);
-      }, 150, { leading: true, trailing: true }) // Update immediately, then max every 150ms, ensure last update happens
-  ).current; // Use .current to get the stable function reference
+    throttle((newText) => {
+        console.log(`>>> Throttled func RUNNING. Target Text Length: ${newText?.length ?? 0}. Current Display State ID: ${streamingMessageDisplay.id}`); // Log state *before* setting
+        setStreamingMessageDisplay(prev => {
+            const newState = { ...prev, id: currentStreamIdRef.current, text: newText, sender: 'bot' };
+            console.log(`>>> Throttled func SETTING state. New Text Length: ${newState.text?.length ?? 0}. New ID: ${newState.id}`); // Log state *being set*
+            return newState;
+        });
+    }, 150, { leading: true, trailing: true })
+  ).current;
+
+  // Added this useEffect to log the state *after* React processes the update
+  useEffect(() => {
+    if (streamingMessageDisplay.id) {
+        console.log(`<<< State AFTER render. Display ID: ${streamingMessageDisplay.id}, Display Text Length: ${streamingMessageDisplay.text?.length ?? 0}`);
+    }
+  }, [streamingMessageDisplay]); // Run whenever the display state changes
 
 
   // *** 3. Add useEffect for throttle cleanup ***
@@ -73,6 +82,15 @@ function App() {
 
     closeEventSource();
     setIsLoading(false);
+
+    // *** TEMPORARY DELAY BEFORE CLEARING ***
+    setTimeout(() => {
+      console.log("[FINALIZE STREAM] DELAYED: Resetting streamingMessageDisplay and ref.");
+      setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
+      currentStreamIdRef.current = null;
+      currentStreamTextRef.current = '';
+    }, 500); // Delay for 500ms (adjust if needed)
+    // *** END TEMPORARY DELAY ***
 
     // Reset display state and refs
     setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
