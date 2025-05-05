@@ -83,15 +83,6 @@ function App() {
     closeEventSource();
     setIsLoading(false);
 
-    // *** TEMPORARY DELAY BEFORE CLEARING ***
-    setTimeout(() => {
-      console.log("[FINALIZE STREAM] DELAYED: Resetting streamingMessageDisplay and ref.");
-      setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
-      currentStreamIdRef.current = null;
-      currentStreamTextRef.current = '';
-    }, 500); // Delay for 500ms (adjust if needed)
-    // *** END TEMPORARY DELAY ***
-
     // Reset display state and refs
     setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
     currentStreamIdRef.current = null;
