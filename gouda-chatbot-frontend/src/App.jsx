@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 // *** 1. Import throttle ***
-import { throttle } from 'lodash.throttle'; // Or from 'lodash' if you installed the full library
+import throttle from 'lodash.throttle';
 import ChatWindow from './components/ChatWindow';
 import InstructionsInput from './components/InstructionsInput';
 import ChatInputArea from './components/ChatInputArea';
