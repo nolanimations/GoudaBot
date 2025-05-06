@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_caching import Cache
+import openai
 import os # Import os to read environment variables
 
 app = Flask(__name__)
@@ -20,6 +21,19 @@ else:
 # Apply CORS using the list read from environment variable
 CORS(app, origins=allowed_origins_list, supports_credentials=True)
 # --- End CORS Configuration ---
+
+# --- Load .csv Files into OpenAI for Retrieval
+
+openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+csvFileNames = ["alle_organisaties.csv", "events.csv", "ingouda_onderwerpen.csv"]
+
+for filename in csvFileNames:
+    with open("Data/" + filename, "rb") as f:
+        response = openai.files.create(
+            file=f,
+            purpose="assistants"  # For retrieval/assistants API
+        )
 
 
 # Simple in-memory cache (for production, use 'redis' or 'memcached')
