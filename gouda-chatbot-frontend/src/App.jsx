@@ -57,7 +57,7 @@ function App() {
           return newState;
         });
       },
-      150,
+      30, // Lower delay for more frequent updates
       { leading: true, trailing: true }
     )
   ).current;
