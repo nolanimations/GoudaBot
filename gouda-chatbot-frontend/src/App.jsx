@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 // *** 1. Import throttle ***
-import throttle from "lodash.throttle";
+import throttle from "lodash/throttle";
 import ChatWindow from "./components/ChatWindow";
 import InstructionsInput from "./components/InstructionsInput";
 import ChatInputArea from "./components/ChatInputArea";
@@ -229,14 +229,12 @@ function App() {
           sender: "bot",
         }));
 
-        new Promise((resolve) => setTimeout(resolve, 1500)); // Allow React to process the state update (removed 'await' since not in async function)
-
         // Append to the ref immediately to track full text
         currentStreamTextRef.current += newData;
 
         // *** 5. Call the throttled function to update display state ***
         // Pass the *full* accumulated text from the ref
-        // throttledSetStreamingDisplayText(currentStreamTextRef.current);
+        throttledSetStreamingDisplayText(currentStreamTextRef.current);
       };
 
       eventSourceRef.current.addEventListener("close", (event) => {
