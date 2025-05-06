@@ -222,19 +222,15 @@ function App() {
         const newData = event.data;
         console.log("SSE onmessage received data:", newData);
 
-        setStreamingMessageDisplay((prev) => ({
-          ...prev,
+        // Show only the latest chunk
+        setStreamingMessageDisplay({
           id: currentStreamIdRef.current,
-          text: prev.text + newData,
+          text: newData,
           sender: "bot",
-        }));
+        });
 
-        // Append to the ref immediately to track full text
+        // Still accumulate the full text for final message
         currentStreamTextRef.current += newData;
-
-        // *** 5. Call the throttled function to update display state ***
-        // Pass the *full* accumulated text from the ref
-        throttledSetStreamingDisplayText(currentStreamTextRef.current);
       };
 
       eventSourceRef.current.addEventListener("close", (event) => {
