@@ -2,6 +2,9 @@ from flask import Flask
 from flask_cors import CORS
 from flask_caching import Cache
 import openai
+
+from dotenv import load_dotenv
+
 import os # Import os to read environment variables
 
 app = Flask(__name__)
@@ -24,16 +27,38 @@ CORS(app, origins=allowed_origins_list, supports_credentials=True)
 
 # --- Load .csv Files into OpenAI for Retrieval
 
+load_dotenv()
 openai.api_key = os.environ.get("OPENAI_API_KEY")
+if not openai.api_key:
+    print("ERROR: OPENAI_API_KEY not set in environment!")
 
-csvFileNames = ["alle_organisaties.csv", "events.csv", "ingouda_onderwerpen.csv"]
+csvFileNames = ["Data/alle_organisaties.txt", "Data/events.txt", "Data/ingouda_onderwerpen.txt"]
+# openaiFileIds = []
+
+# for filename in csvFileNames:
+#     file_path = os.path.join("Data", filename)
+#     with open(file_path, "rb") as f:
+#         response = openai.files.create(
+#             file=f,
+#             purpose="assistants"  # For retrieval/assistants API
+#         )
+#         openaiFileIds.append(response.id)
+
+# app.config['OPENAI_FILE_IDS'] = openaiFileIds  # Store file IDs in app config
+
+# --- End OpenAI File Upload ---
+
+# --- Configure Retrieval  ---
+
+vector_store = openai.vector_stores.create(name="Gouda Data")
+
+app.config['VECTOR_STORE_ID'] = vector_store.id  # Store vector store ID in app config
 
 for filename in csvFileNames:
-    with open("Data/" + filename, "rb") as f:
-        response = openai.files.create(
-            file=f,
-            purpose="assistants"  # For retrieval/assistants API
-        )
+    openai.vector_stores.files.upload_and_poll(        # Upload file
+        vector_store_id=vector_store.id,
+        file=open(filename, "rb")
+    )
 
 
 # Simple in-memory cache (for production, use 'redis' or 'memcached')
