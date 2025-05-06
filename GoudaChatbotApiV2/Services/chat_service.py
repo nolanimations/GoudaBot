@@ -1,6 +1,7 @@
 import openai
 from dotenv import load_dotenv
 from threading import Lock
+from flask import current_app
 
 # In-memory session manager (thread-safe)
 class SessionManager:
@@ -22,7 +23,7 @@ class SessionManager:
 class ChatSession:
     def __init__(self, custom_instructions=None):
         self.custom_instructions = custom_instructions or (
-            "Je bent een behulpzame AI-assistent gespecialiseerd in activiteiten en revalidatiemogelijkheden in Gouda, Nederland. Reageer vriendelijk en informatief."
+            "Je bent een behulpzame AI-assistent gespecialiseerd in activiteiten en revalidatiemogelijkheden in Gouda, Nederland. Reageer vriendelijk en informatief. Geef in je antwoord ook website links mee als je naar een instantie refereert. Geef alleen de rauwe data terug zoals je het krijgt"
         )
         self.history = []
 
@@ -31,13 +32,20 @@ class ChatService:
         load_dotenv()
         openai.api_key = openai_api_key
 
-    async def stream_chat_completion_chunks_async(self, request):
+    def stream_chat_completion_chunks(self, request):
         # Session management
         session = SessionManager.get_or_create_session(request['session_id'], request.get('custom_instructions'))
         effective_instructions = request.get('custom_instructions') or session.custom_instructions
 
         # Add user message to history
         session.history.append({"role": "user", "content": request['message']})
+
+        retrieval_response = self.run_retrieval(request['message'], request['session_id'])
+
+        if retrieval_response != "No relevant information found.":
+            session.history.append({"role": "assistant", "content": retrieval_response})
+        
+        SessionManager.save_session(request["session_id"], session)
 
         # Prepare messages for OpenAI
         messages = [{"role": "system", "content": effective_instructions}] + session.history
@@ -50,14 +58,7 @@ class ChatService:
             stream=True,
         )
 
-        # Yield chunks as they arrive
-        async def chunk_generator():
-            async for chunk in response:
-                delta = chunk.choices[0].delta.content if chunk.choices[0].delta else ""
-                if delta:
-                    yield delta
-
-        return chunk_generator(), session
+        return self.chunk_generator(response), None
 
     def update_history_after_stream(self, session_id, full_assistant_response):
         session = SessionManager.get_or_create_session(session_id)
@@ -78,6 +79,37 @@ class ChatService:
                     session.history = session.history[items_to_remove:]
 
         SessionManager.save_session(session_id, session)
+    
+    def get_vector_store_id(self):
+        return current_app.config.get('VECTOR_STORE_ID', None)
+    
+    def chunk_generator(self, response):
+        for chunk in response:
+            yield chunk.choices[0].delta.content or ""
+
+    def run_retrieval(self, user_message, session_id):
+        vectorStoreId = self.get_vector_store_id()
+        if not vectorStoreId:
+            raise Exception("Vector Store ID not configured.")
+
+        # 1. Run the Retrieval
+        results = openai.vector_stores.search(
+            vector_store_id=vectorStoreId,
+            query=user_message,
+        )
+
+        # 2. Extract relevant text from results
+        retrieved_texts = []
+        for item in results:  # <-- Iterate directly over results
+            file_info = f'From "{getattr(item, "filename", "")}":\n'
+            for content in getattr(item, "content", []):
+                if getattr(content, "type", None) == "text":
+                    retrieved_texts.append(file_info + getattr(content, "text", ""))
+
+        # 3. Combine all retrieved texts into one string
+        combined_retrieved = "\n\n".join(retrieved_texts) if retrieved_texts else "No relevant information found."
+
+        return combined_retrieved
 
 # Singleton instance for import in controller
 import os
