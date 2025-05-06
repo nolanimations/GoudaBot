@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
+// *** 1. Import throttle ***
+import throttle from "lodash.throttle";
 import ChatWindow from "./components/ChatWindow";
 import InstructionsInput from "./components/InstructionsInput";
 import ChatInputArea from "./components/ChatInputArea";
@@ -31,6 +33,55 @@ function App() {
   const streamCompletedRef = useRef(false);
   const eventSourceRef = useRef(null);
 
+  // *** 2. Create the stable throttled function using useRef ***
+  const throttledSetStreamingDisplayText = useRef(
+    throttle(
+      (newText) => {
+        console.log(
+          `>>> Throttled func RUNNING. Target Text Length: ${
+            newText?.length ?? 0
+          }. Current Display State ID: ${streamingMessageDisplay.id}`
+        ); // Log state *before* setting
+        setStreamingMessageDisplay((prev) => {
+          const newState = {
+            ...prev,
+            id: currentStreamIdRef.current,
+            text: newText,
+            sender: "bot",
+          };
+          console.log(
+            `>>> Throttled func SETTING state. New Text Length: ${
+              newState.text?.length ?? 0
+            }. New ID: ${newState.id}`
+          ); // Log state *being set*
+          return newState;
+        });
+      },
+      150,
+      { leading: true, trailing: true }
+    )
+  ).current;
+
+  // Added this useEffect to log the state *after* React processes the update
+  useEffect(() => {
+    if (streamingMessageDisplay.id) {
+      console.log(
+        `<<< State AFTER render. Display ID: ${
+          streamingMessageDisplay.id
+        }, Display Text Length: ${streamingMessageDisplay.text?.length ?? 0}`
+      );
+    }
+  }, [streamingMessageDisplay]); // Run whenever the display state changes
+
+  // *** 3. Add useEffect for throttle cleanup ***
+  useEffect(() => {
+    return () => {
+      // Cancel any pending throttled calls when component unmounts
+      throttledSetStreamingDisplayText.cancel();
+      console.log("Throttled function cancelled on unmount.");
+    };
+  }, [throttledSetStreamingDisplayText]); // Dependency ensures cleanup is set up correctly
+
   const closeEventSource = useCallback(() => {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -48,11 +99,24 @@ function App() {
       }
       streamCompletedRef.current = true;
 
+      // *** 4. Cancel pending throttle calls before final update ***
+      throttledSetStreamingDisplayText.cancel();
+      console.log("[FINALIZE STREAM] Cancelled pending throttled calls.");
+
       const finalMessageId = currentStreamIdRef.current;
       const finalMessageText = currentStreamTextRef.current;
 
+      console.log(
+        `[FINALIZE STREAM] START. isError=${isError}. Ref ID: ${finalMessageId}, Ref Text: "${finalMessageText}"`
+      );
+
       closeEventSource();
       setIsLoading(false);
+
+      // Reset display state and refs
+      setStreamingMessageDisplay({ id: null, text: "", sender: "bot" });
+      currentStreamIdRef.current = null;
+      currentStreamTextRef.current = "";
 
       if (finalMessageId && finalMessageText) {
         const messageToAdd = {
@@ -62,30 +126,44 @@ function App() {
             : finalMessageText,
           sender: "bot",
         };
+        console.log(
+          `[FINALIZE STREAM] Preparing to add message to state:`,
+          messageToAdd
+        );
         setMessages((prev) => {
+          console.log(
+            `[FINALIZE STREAM] setMessages update function. Adding ID ${messageToAdd.id}. Prev count: ${prev.length}`
+          );
           if (prev.some((msg) => msg.id === messageToAdd.id)) {
+            console.warn(
+              `[FINALIZE STREAM] Message with ID ${messageToAdd.id} already exists. Skipping add.`
+            );
             return prev;
           }
           return [...prev, messageToAdd];
         });
+      } else {
+        console.log(
+          `[FINALIZE STREAM] No final message text or ID to add (ID: ${finalMessageId}, Text: "${finalMessageText}").`
+        );
       }
-
-      // Delay clearing the streaming bubble until after the message is added
-      setTimeout(() => {
-        setStreamingMessageDisplay({ id: null, text: "", sender: "bot" });
-        currentStreamIdRef.current = null;
-        currentStreamTextRef.current = "";
-      }, 50); // Small delay to allow React to render the last streaming update
+      console.log(`[FINALIZE STREAM] END.`);
     },
-    [closeEventSource, setIsLoading, setMessages]
-  ); // Remove throttle func from dependencies
+    [
+      closeEventSource,
+      setIsLoading,
+      setMessages,
+      setStreamingMessageDisplay,
+      throttledSetStreamingDisplayText,
+    ]
+  ); // Include dependencies (setters, throttle func)
 
   useEffect(() => {
     return () => {
       streamCompletedRef.current = false;
       closeEventSource();
     };
-  }, [closeEventSource, streamingMessageDisplay]);
+  }, [closeEventSource]);
 
   const handleSendMessage = useCallback(async () => {
     const userMessageText = currentInput.trim();
@@ -144,7 +222,6 @@ function App() {
         const newData = event.data;
         console.log("SSE onmessage received data:", newData);
 
-        // Append only the new chunk to the display
         setStreamingMessageDisplay((prev) => ({
           ...prev,
           id: currentStreamIdRef.current,
@@ -152,8 +229,14 @@ function App() {
           sender: "bot",
         }));
 
+        new Promise((resolve) => setTimeout(resolve, 1500)); // Allow React to process the state update (removed 'await' since not in async function)
+
         // Append to the ref immediately to track full text
         currentStreamTextRef.current += newData;
+
+        // *** 5. Call the throttled function to update display state ***
+        // Pass the *full* accumulated text from the ref
+        // throttledSetStreamingDisplayText(currentStreamTextRef.current);
       };
 
       eventSourceRef.current.addEventListener("close", (event) => {
@@ -186,6 +269,7 @@ function App() {
       closeEventSource();
       streamCompletedRef.current = true;
     }
+    // Include throttle function ref in dependencies if needed by linters, though its reference is stable
   }, [
     currentInput,
     isLoading,
@@ -193,7 +277,8 @@ function App() {
     customInstructions,
     closeEventSource,
     finalizeStream,
-  ]); // Remove throttle func from dependencies
+    throttledSetStreamingDisplayText,
+  ]);
 
   return (
     <div className="app-container">
