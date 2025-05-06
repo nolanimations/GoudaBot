@@ -9,11 +9,6 @@ import "./App.css";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ""; // Default to empty string
 const API_URL = `${API_BASE_URL}/api/chat`;
 
-// Utility sleep function
-function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
 function App() {
   const [messages, setMessages] = useState([
     {
@@ -42,6 +37,11 @@ function App() {
   const throttledSetStreamingDisplayText = useRef(
     throttle(
       (newText) => {
+        console.log(
+          `>>> Throttled func RUNNING. Target Text Length: ${
+            newText?.length ?? 0
+          }. Current Display State ID: ${streamingMessageDisplay.id}`
+        ); // Log state *before* setting
         setStreamingMessageDisplay((prev) => {
           const newState = {
             ...prev,
@@ -49,6 +49,11 @@ function App() {
             text: newText,
             sender: "bot",
           };
+          console.log(
+            `>>> Throttled func SETTING state. New Text Length: ${
+              newState.text?.length ?? 0
+            }. New ID: ${newState.id}`
+          ); // Log state *being set*
           return newState;
         });
       },
@@ -60,7 +65,11 @@ function App() {
   // Added this useEffect to log the state *after* React processes the update
   useEffect(() => {
     if (streamingMessageDisplay.id) {
-      // Optional: console.log for debugging
+      console.log(
+        `<<< State AFTER render. Display ID: ${
+          streamingMessageDisplay.id
+        }, Display Text Length: ${streamingMessageDisplay.text?.length ?? 0}`
+      );
     }
   }, [streamingMessageDisplay]); // Run whenever the display state changes
 
@@ -69,6 +78,7 @@ function App() {
     return () => {
       // Cancel any pending throttled calls when component unmounts
       throttledSetStreamingDisplayText.cancel();
+      console.log("Throttled function cancelled on unmount.");
     };
   }, [throttledSetStreamingDisplayText]); // Dependency ensures cleanup is set up correctly
 
@@ -76,6 +86,7 @@ function App() {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
+      console.log("EventSource explicitly closed.");
     }
   }, []);
 
@@ -83,15 +94,21 @@ function App() {
   const finalizeStream = useCallback(
     (isError = false, errorMessage = "[Verbinding verbroken]") => {
       if (streamCompletedRef.current) {
+        console.log("[FINALIZE STREAM] Already marked as completed. Skipping.");
         return;
       }
       streamCompletedRef.current = true;
 
       // *** 4. Cancel pending throttle calls before final update ***
       throttledSetStreamingDisplayText.cancel();
+      console.log("[FINALIZE STREAM] Cancelled pending throttled calls.");
 
       const finalMessageId = currentStreamIdRef.current;
       const finalMessageText = currentStreamTextRef.current;
+
+      console.log(
+        `[FINALIZE STREAM] START. isError=${isError}. Ref ID: ${finalMessageId}, Ref Text: "${finalMessageText}"`
+      );
 
       closeEventSource();
       setIsLoading(false);
@@ -109,13 +126,28 @@ function App() {
             : finalMessageText,
           sender: "bot",
         };
+        console.log(
+          `[FINALIZE STREAM] Preparing to add message to state:`,
+          messageToAdd
+        );
         setMessages((prev) => {
+          console.log(
+            `[FINALIZE STREAM] setMessages update function. Adding ID ${messageToAdd.id}. Prev count: ${prev.length}`
+          );
           if (prev.some((msg) => msg.id === messageToAdd.id)) {
+            console.warn(
+              `[FINALIZE STREAM] Message with ID ${messageToAdd.id} already exists. Skipping add.`
+            );
             return prev;
           }
           return [...prev, messageToAdd];
         });
+      } else {
+        console.log(
+          `[FINALIZE STREAM] No final message text or ID to add (ID: ${finalMessageId}, Text: "${finalMessageText}").`
+        );
       }
+      console.log(`[FINALIZE STREAM] END.`);
     },
     [
       closeEventSource,
@@ -133,7 +165,7 @@ function App() {
     };
   }, [closeEventSource]);
 
-  const handleSendMessage = useCallback(() => {
+  const handleSendMessage = useCallback(async () => {
     const userMessageText = currentInput.trim();
     if (!userMessageText || isLoading) return;
 
@@ -153,44 +185,93 @@ function App() {
 
     const streamingId = Date.now() + 1;
     currentStreamIdRef.current = streamingId;
-    setStreamingMessageDisplay({ id: streamingId, text: "", sender: "bot" });
+    setStreamingMessageDisplay({ id: streamingId, text: "", sender: "bot" }); // Set initial display state
 
-    // --- SSE connection ---
-    const eventSource = new EventSource(
-      `${API_URL}?session_id=${sessionId}&instructions=${encodeURIComponent(
-        customInstructions
-      )}&message=${encodeURIComponent(userMessageText)}`
-    );
-    eventSourceRef.current = eventSource;
-
-    eventSource.onmessage = (event) => {
-      const newData = event.data;
-      currentStreamTextRef.current += newData;
-      setStreamingMessageDisplay({
-        id: currentStreamIdRef.current,
-        text: currentStreamTextRef.current,
-        sender: "bot",
+    try {
+      const requestBody = {
+        sessionId,
+        message: userMessageText,
+        customInstructions: customInstructions.trim() || null,
+      };
+      const initiateResponse = await fetch(`${API_URL}/initiate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
       });
-    };
+      if (!initiateResponse.ok) {
+        let errorText = `Server error initiating stream: ${initiateResponse.status}`;
+        try {
+          const errorData = await initiateResponse.json();
+          errorText =
+            errorData.detail || errorData.title || JSON.stringify(errorData);
+        } catch {
+          /* Ignore */
+        }
+        throw new Error(errorText);
+      }
+      const { streamId } = await initiateResponse.json();
+      if (!streamId) throw new Error("Did not receive a valid stream ID.");
 
-    eventSource.onerror = () => {
-      finalizeStream(true, "[Verbinding verbroken]");
-    };
+      const streamUrl = `${API_URL}/stream/${streamId}`;
+      eventSourceRef.current = new EventSource(streamUrl);
 
-    eventSource.onopen = () => {
-      // Connection established
-    };
+      eventSourceRef.current.onopen = () =>
+        console.log("EventSource connection established.");
 
-    eventSource.addEventListener("end", () => {
-      finalizeStream(false);
-    });
+      eventSourceRef.current.onmessage = (event) => {
+        const newData = event.data;
+        console.log("SSE onmessage received data:", newData);
+
+        // Show only the latest chunk
+        setStreamingMessageDisplay({
+          id: currentStreamIdRef.current,
+          text: newData,
+          sender: "bot",
+        });
+
+        // Still accumulate the full text for final message
+        currentStreamTextRef.current += newData;
+      };
+
+      eventSourceRef.current.addEventListener("close", (event) => {
+        console.log("Stream closed by server event:", event.data);
+        finalizeStream(false);
+      });
+
+      eventSourceRef.current.onerror = (err) => {
+        console.error("EventSource encountered an error object:", err);
+        if (
+          eventSourceRef.current &&
+          eventSourceRef.current.readyState === EventSource.CLOSED
+        ) {
+          console.log("EventSource error occurred but state is CLOSED.");
+          if (!streamCompletedRef.current) {
+            finalizeStream(false);
+          }
+          return;
+        }
+        setError("Fout bij het ontvangen van het antwoord.");
+        finalizeStream(true);
+      };
+    } catch (err) {
+      console.error("Error in handleSendMessage:", err);
+      setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
+      setIsLoading(false);
+      setStreamingMessageDisplay({ id: null, text: "", sender: "bot" });
+      currentStreamIdRef.current = null;
+      currentStreamTextRef.current = "";
+      closeEventSource();
+      streamCompletedRef.current = true;
+    }
+    // Include throttle function ref in dependencies if needed by linters, though its reference is stable
   }, [
     currentInput,
     isLoading,
-    closeEventSource,
-    finalizeStream,
     sessionId,
     customInstructions,
+    closeEventSource,
+    finalizeStream,
+    throttledSetStreamingDisplayText,
   ]);
 
   return (
