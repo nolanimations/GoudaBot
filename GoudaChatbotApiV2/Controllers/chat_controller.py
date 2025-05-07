@@ -2,8 +2,6 @@ from flask import Blueprint, request, jsonify, Response, current_app
 import asyncio
 import uuid
 
-from main import app
-
 chat_controller = Blueprint('chat_controller', __name__, url_prefix='/api/chat')
 
 class StreamContext:
