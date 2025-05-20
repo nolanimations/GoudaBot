@@ -3,6 +3,7 @@ import openai
 from dotenv import load_dotenv
 from threading import Lock
 from flask import current_app
+import re
 
 # ---------------------------------------------------------------------------
 # 0. Global configuration (dotenv + OpenAI key)
@@ -138,7 +139,6 @@ class ChatService:
 
             for event in run:
                 if event.event == "thread.message.delta":
-                    # event.data.delta.content is a list → extract the text value(s)
                     pieces = []
                     for block in event.data.delta.content or []:
                         if getattr(block, "type", None) == "text":
@@ -146,8 +146,10 @@ class ChatService:
                     chunk_text = "".join(pieces)
 
                     if chunk_text:
-                        full_parts.append(chunk_text)
-                        yield chunk_text
+                        # Apply your regex here
+                        cleaned = re.sub(r'【\d+:\d+†[^】]+】', '', chunk_text)
+                        full_parts.append(cleaned)
+                        yield cleaned
 
             # after stream completes, log the assistant answer
             full_text = "".join(full_parts).strip()
