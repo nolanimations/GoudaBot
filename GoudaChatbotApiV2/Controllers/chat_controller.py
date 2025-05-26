@@ -51,3 +51,22 @@ def get_chat_stream(stream_id):
         yield "event: close\ndata: Stream finished.\n\n"
 
     return Response(event_stream(), mimetype="text/event-stream")
+
+@chat_controller.route('/speech-to-text', methods=['POST'])
+def speech_to_text():
+    if 'audio' not in request.files:
+        return jsonify({"detail": "No audio file provided"}), 400
+    
+    audio_file = request.files['audio']
+
+    if audio_file.filename == '':
+        return jsonify({"detail": "Empty filename."}), 400
+    
+    try:
+        from Services.speech_service import transcribe_audio
+
+        transcription = transcribe_audio(audio_file)
+        return jsonify({"transcription:": transcription})
+    except Exception as e:
+        print(f"[ERROR] Speech-to-text failed: {e}", flush=True)
+        return jsonify({"detail": "Speech-to-text processing failed."}), 500
