@@ -37,8 +37,8 @@ function App() {
   // Centralized function to finalize the stream
   const finalizeStream = useCallback((isError = false, errorMessage = "[Verbinding verbroken]") => {
     if (streamCompletedRef.current) {
-        console.log("[FINALIZE STREAM] Already marked as completed. Skipping.");
-        return;
+      console.log("[FINALIZE STREAM] Already marked as completed. Skipping.");
+      return;
     }
     streamCompletedRef.current = true;
 
@@ -58,22 +58,22 @@ function App() {
 
     // Add the final message using values read from refs
     if (finalMessageId && finalMessageText) {
-        const messageToAdd = {
-            id: finalMessageId,
-            text: isError ? `${finalMessageText} ${errorMessage}` : finalMessageText,
-            sender: 'bot'
-        };
-        console.log(`[FINALIZE STREAM] Preparing to add message to state:`, messageToAdd);
-        setMessages(prev => {
-             console.log(`[FINALIZE STREAM] setMessages update function. Adding ID ${messageToAdd.id}. Prev count: ${prev.length}`);
-             if (prev.some(msg => msg.id === messageToAdd.id)) {
-                 console.warn(`[FINALIZE STREAM] Message with ID ${messageToAdd.id} already exists. Skipping add.`);
-                 return prev;
-             }
-             return [...prev, messageToAdd];
-        });
+      const messageToAdd = {
+        id: finalMessageId,
+        text: isError ? `${finalMessageText} ${errorMessage}` : finalMessageText,
+        sender: 'bot'
+      };
+      console.log(`[FINALIZE STREAM] Preparing to add message to state:`, messageToAdd);
+      setMessages(prev => {
+        console.log(`[FINALIZE STREAM] setMessages update function. Adding ID ${messageToAdd.id}. Prev count: ${prev.length}`);
+        if (prev.some(msg => msg.id === messageToAdd.id)) {
+          console.warn(`[FINALIZE STREAM] Message with ID ${messageToAdd.id} already exists. Skipping add.`);
+          return prev;
+        }
+        return [...prev, messageToAdd];
+      });
     } else {
-         console.log(`[FINALIZE STREAM] No final message text or ID to add (ID: ${finalMessageId}, Text: "${finalMessageText}").`);
+      console.log(`[FINALIZE STREAM] No final message text or ID to add (ID: ${finalMessageId}, Text: "${finalMessageText}").`);
     }
     console.log(`[FINALIZE STREAM] END.`);
 
@@ -83,8 +83,8 @@ function App() {
 
   useEffect(() => {
     return () => {
-        streamCompletedRef.current = false;
-        closeEventSource();
+      streamCompletedRef.current = false;
+      closeEventSource();
     };
   }, [closeEventSource]);
 
@@ -138,9 +138,9 @@ function App() {
       eventSourceRef.current.onerror = (err) => {
         console.error("EventSource encountered an error object:", err);
         if (eventSourceRef.current && eventSourceRef.current.readyState === EventSource.CLOSED) {
-           console.log("EventSource error occurred but state is CLOSED.");
-           if (!streamCompletedRef.current) { finalizeStream(false); } // Still finalize if needed
-           return;
+          console.log("EventSource error occurred but state is CLOSED.");
+          if (!streamCompletedRef.current) { finalizeStream(false); } // Still finalize if needed
+          return;
         }
         setError("Fout bij het ontvangen van het antwoord.");
         finalizeStream(true);
@@ -161,18 +161,24 @@ function App() {
 
   return (
     <div className="app-container">
-      <h1>Waar kan ik je mee helpen?</h1>
-      <InstructionsInput
+      <div className="header-bar">
+        <img src="/logo.png" alt="Gouda Logo" className="logo" />
+        <span className="header-title">Gouda Chatbot</span>
+      </div>
+
+
+      <h1 style={{ color: 'var(--text-header)' }}>Waar kan ik je mee helpen?</h1>
+      {/* <InstructionsInput
         value={customInstructions}
         onChange={setCustomInstructions}
         disabled={isLoading}
-      />
+      /> */}
       <ChatWindow
         messages={messages}
         // Pass the display state object
         streamingMessage={streamingMessageDisplay.id ? streamingMessageDisplay : null}
       />
-       {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message">{error}</div>}
       <ChatInputArea
         inputValue={currentInput}
         onInputChange={setCurrentInput}

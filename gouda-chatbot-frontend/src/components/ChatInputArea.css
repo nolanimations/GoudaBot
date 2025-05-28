@@ -11,7 +11,7 @@
     flex-grow: 1;
     background-color: transparent;
     border: none;
-    color: var(--text-primary);
+    color: var(--text-user-input);
     padding: 10px 5px; /* Padding inside textarea */
     resize: none; /* Disable manual resize */
     overflow-y: auto; /* Allow scrolling if text overflows max-height */
@@ -59,6 +59,5 @@
   }
   
   .send-button svg {
-    /* Adjust SVG position slightly if needed */
-    /* transform: translateX(1px); */
+    color: var(--text-send-icon);
   }
