@@ -45,9 +45,13 @@ def get_chat_stream(stream_id):
     chunk_generator, _ = chat_service.stream_chat_completion_chunks(request_data)
 
     def event_stream():
-        for chunk in chunk_generator:
-            formatted_chunk = chunk.replace("\n", "<br>")
-            yield f"data: {formatted_chunk}\n\n"
-        yield "event: close\ndata: Stream finished.\n\n"
+        try:
+            for chunk in chunk_generator:
+                formatted_chunk = chunk.replace("\n", "<br>")
+                yield f"data: {formatted_chunk}\n\n"
+            yield "event: close\ndata: Stream finished.\n\n"
+        except Exception as e:
+            yield f"event: close\ndata: [Fout in verwerking]: {e}\n\n"
+
 
     return Response(event_stream(), mimetype="text/event-stream")
