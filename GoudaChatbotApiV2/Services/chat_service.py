@@ -146,12 +146,10 @@ class ChatService:
                     chunk_text = "".join(pieces)
 
                     if chunk_text:
-                        # Apply your regex here
                         cleaned = re.sub(r'【\d+:\d+†[^】]+】', '', chunk_text)
                         full_parts.append(cleaned)
                         yield cleaned
 
-            # after stream completes, log the assistant answer
             full_text = "".join(full_parts).strip()
             if full_text:
                 session.history.append({"role": "assistant", "content": full_text})
@@ -160,9 +158,8 @@ class ChatService:
 
         return chunk_generator(), None
 
-    # (Optional) Backwards-compatibility method for updating history after stream – not needed now
     def update_history_after_stream(self, session_id: str, full_assistant_response: str | None):
-        pass  # History is already updated within stream_chat_completion_chunks
+        pass
 
 # 4. Singleton instance (for use in the Flask controller)
 chat_service = ChatService(openai_api_key=os.getenv("OPENAI_API_KEY"))
