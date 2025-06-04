@@ -238,7 +238,9 @@ function App() {
       />
       <SpeechToTextInput
         isDisabled={isLoading}
-        onTranscription={(transcribedText) => setCurrentInput(transcribedText)}
+        onTranscription={(transcribedText) =>
+          setCurrentInput((prev) => (prev + " " + transcribedText).trim())
+        }
       />
     </div>
   );
