@@ -107,9 +107,6 @@ function App() {
     const streamingId = Date.now() + 1;
     currentStreamIdRef.current = streamingId; // *** STORE ID IN REF ***
 
-    // Update display state for rendering
-    setStreamingMessageDisplay({ id: streamingId, text: '', sender: 'bot' });
-
     try {
       // ... (fetch initiate, get streamId) ...
       const requestBody = { sessionId, message: userMessageText, customInstructions: customInstructions.trim() || null };
@@ -145,6 +142,29 @@ function App() {
         setError("Fout bij het ontvangen van het antwoord.");
         finalizeStream(true);
       };
+
+      // New streaming response handling
+      const response = await fetch(streamUrl);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      currentStreamTextRef.current = '';
+      setStreamingMessageDisplay({ id: streamingId, text: '', sender: 'bot' });
+
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        done = streamDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          currentStreamTextRef.current += chunk;
+          setStreamingMessageDisplay(prev => ({
+            ...prev,
+            text: currentStreamTextRef.current
+          }));
+        }
+      }
+      finalizeStream(false);
 
     } catch (err) {
       console.error("Error in handleSendMessage:", err);
