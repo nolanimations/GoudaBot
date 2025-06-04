@@ -96,54 +96,28 @@ function App() {
     setError(null);
     closeEventSource();
     streamCompletedRef.current = false;
-    currentStreamTextRef.current = ''; // Reset text ref
+    currentStreamTextRef.current = '';
 
     const newUserMessage = { id: Date.now(), text: userMessageText, sender: 'user' };
     setMessages(prev => [...prev, newUserMessage]);
     setCurrentInput('');
     setIsLoading(true);
 
-    // Generate and STORE the ID in the REF immediately
     const streamingId = Date.now() + 1;
-    currentStreamIdRef.current = streamingId; // *** STORE ID IN REF ***
+    currentStreamIdRef.current = streamingId;
 
     try {
-      // ... (fetch initiate, get streamId) ...
       const requestBody = { sessionId, message: userMessageText, customInstructions: customInstructions.trim() || null };
-      const initiateResponse = await fetch(`${API_BASE_URL}/api/chat/initiate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(requestBody) });
+      const initiateResponse = await fetch(`${API_BASE_URL}/api/chat/initiate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
       if (!initiateResponse.ok) throw new Error(`Server error initiating stream: ${initiateResponse.status}`);
       const { streamId } = await initiateResponse.json();
       if (!streamId) throw new Error("Did not receive a valid stream ID.");
 
       const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
-      eventSourceRef.current = new EventSource(streamUrl);
-
-      eventSourceRef.current.onopen = () => console.log("EventSource connection established.");
-
-      eventSourceRef.current.onmessage = (event) => {
-        // Update the text ref directly
-        currentStreamTextRef.current += event.data;
-        // Update the display state for rendering
-        setStreamingMessageDisplay(prev => ({ ...prev, text: currentStreamTextRef.current }));
-      };
-
-      eventSourceRef.current.addEventListener('close', (event) => {
-        console.log('Stream closed by server event:', event.data);
-        finalizeStream(false);
-      });
-
-      eventSourceRef.current.onerror = (err) => {
-        console.error("EventSource encountered an error object:", err);
-        if (eventSourceRef.current && eventSourceRef.current.readyState === EventSource.CLOSED) {
-           console.log("EventSource error occurred but state is CLOSED.");
-           if (!streamCompletedRef.current) { finalizeStream(false); } // Still finalize if needed
-           return;
-        }
-        setError("Fout bij het ontvangen van het antwoord.");
-        finalizeStream(true);
-      };
-
-      // New streaming response handling
       const response = await fetch(streamUrl);
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -170,8 +144,8 @@ function App() {
       console.error("Error in handleSendMessage:", err);
       setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
       setIsLoading(false);
-      setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' }); // Reset display
-      currentStreamIdRef.current = null; // Reset refs on fetch error
+      setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
+      currentStreamIdRef.current = null;
       currentStreamTextRef.current = '';
       closeEventSource();
       streamCompletedRef.current = true;
