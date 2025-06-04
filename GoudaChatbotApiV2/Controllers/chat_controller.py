@@ -47,12 +47,11 @@ def get_chat_stream(stream_id):
     def event_stream():
         for chunk in chunk_generator:
             formatted_chunk = chunk.replace("\n", "<br>")
-            yield f"data: {formatted_chunk}\n\n"
-        yield "event: close\ndata: Stream finished.\n\n"
+            yield formatted_chunk  # No SSE wrapping!
     headers = {
         "Cache-Control": "no-cache",
         "X-Accel-Buffering": "no",  # For nginx, if used
-        "Content-Type": "text/event-stream",
+        "Content-Type": "application/octet-stream",
         "Connection": "keep-alive",
         "Transfer-Encoding": "chunked"
     }
