@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, Response, current_app
+from flask import Blueprint, request, jsonify, Response, current_app, stream_with_context
 import asyncio
 import uuid
 
@@ -49,5 +49,12 @@ def get_chat_stream(stream_id):
             formatted_chunk = chunk.replace("\n", "<br>")
             yield f"data: {formatted_chunk}\n\n"
         yield "event: close\ndata: Stream finished.\n\n"
+    headers = {
+        "Cache-Control": "no-cache",
+        "X-Accel-Buffering": "no",  # For nginx, if used
+        "Content-Type": "text/event-stream",
+        "Connection": "keep-alive",
+        "Transfer-Encoding": "chunked"
+    }
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(stream_with_context(event_stream()), headers=headers)
