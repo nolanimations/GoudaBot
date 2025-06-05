@@ -1,18 +1,23 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import ChatWindow from './components/ChatWindow';
-import InstructionsInput from './components/InstructionsInput';
-import ChatInputArea from './components/ChatInputArea';
-import './App.css';
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import ChatWindow from "./components/ChatWindow";
+import InstructionsInput from "./components/InstructionsInput";
+import ChatInputArea from "./components/ChatInputArea";
+import SpeechToTextInput from "./components/SpeechToTextInput";
+import "./App.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_URL = `${API_BASE_URL}/api/chat`;
 
 function App() {
   const [messages, setMessages] = useState([
-    { id: 0, text: 'Hallo! Stel je vraag over activiteiten of revalidatie in Gouda.', sender: 'bot' }
+    {
+      id: 0,
+      text: "Hallo! Stel je vraag over activiteiten of revalidatie in Gouda.",
+      sender: "bot",
+    },
   ]);
-  const [currentInput, setCurrentInput] = useState('');
-  const [customInstructions, setCustomInstructions] = useState('');
+  const [currentInput, setCurrentInput] = useState("");
+  const [customInstructions, setCustomInstructions] = useState("");
   const [sessionId] = useState(() => crypto.randomUUID());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -81,9 +86,13 @@ function App() {
     streamCompletedRef.current = false;
     currentStreamTextRef.current = '';
 
-    const newUserMessage = { id: Date.now(), text: userMessageText, sender: 'user' };
-    setMessages(prev => [...prev, newUserMessage]);
-    setCurrentInput('');
+    const newUserMessage = {
+      id: Date.now(),
+      text: userMessageText,
+      sender: "user",
+    };
+    setMessages((prev) => [...prev, newUserMessage]);
+    setCurrentInput("");
     setIsLoading(true);
 
     const streamingId = Date.now() + 1;
@@ -108,7 +117,10 @@ function App() {
       if (!streamId) throw new Error("Geen stream ID ontvangen.");
 
       const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
-      eventSourceRef.current = new EventSource(streamUrl);
+      const response = await fetch(streamUrl);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
 
       eventSourceRef.current.onopen = () => console.log("EventSource verbinding geopend.");
 
@@ -131,10 +143,8 @@ function App() {
           if (!streamCompletedRef.current) finalizeStream(false);
           return;
         }
-        setError("Fout bij het ontvangen van het antwoord.");
-        finalizeStream(true);
-      };
-
+      }
+      finalizeStream(false);
     } catch (err) {
       console.error("Fout in handleSendMessage:", err);
       setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
@@ -171,6 +181,12 @@ function App() {
         isLoading={isLoading}
         useAltFont={useAltFont}
         onToggleFont={handleToggleFont}
+      />
+      <SpeechToTextInput
+        isDisabled={isLoading}
+        onTranscription={(transcribedText) =>
+          setCurrentInput((prev) => (prev + " " + transcribedText).trim())
+        }
       />
     </div>
   );
