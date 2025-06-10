@@ -1,5 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import './ChatInputArea.css';
+import SpeechToTextInput from './SpeechToTextInput';
+
 
 function ChatInputArea({ inputValue, onInputChange, onSendMessage, isLoading, useAltFont, onToggleFont }) {
   const textareaRef = useRef(null);
@@ -45,21 +47,10 @@ function ChatInputArea({ inputValue, onInputChange, onSendMessage, isLoading, us
       <button onClick={onToggleFont} className="font-toggle-button" title="Wissel lettertype">
         <span>Aᵃ</span>
       </button>
-      <button
-        className="audio-button"
-        title="Geluid"
-        aria-label="Audio afspelen"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          width="20"
-          height="20"
-        >
-    <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7.001 7.001 0 006.938-6H18a5.978 5.978 0 01-2.197 4.65A5.978 5.978 0 0112 19v2h-2v-2a7.001 7.001 0 006.938-6H18a5.978 5.978 0 01-2.197 4.65A5.978 5.978 0 0112 19v2h-2v-2z" />        </svg>
-      </button>
-
+      <SpeechToTextInput
+        isDisabled={isLoading}
+        onTranscription={(text) => onInputChange(inputValue + ' ' + text)}
+      />
     </div>
   );
 }

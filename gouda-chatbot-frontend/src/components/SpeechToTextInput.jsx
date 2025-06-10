@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./SpeechToTextInput";
+import "./SpeechToTextInput.css";
 
 const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
   const [isListening, setIsListening] = useState(false);
@@ -60,17 +60,23 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
   };
 
   return (
-    <div className={`speech-input-container ${isListening ? "listening" : ""}`}>
-      <button
-        className="mic-button"
-        onClick={toggleListening}
-        disabled={isDisabled}
-        title="Klik om spraak naar tekst te starten of stoppen"
+    <button
+      className="audio-button"
+      onClick={toggleListening}
+      disabled={isDisabled}
+      title="Klik om spraak naar tekst te starten of stoppen"
+      aria-label="Spraak invoer"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        width="20"
+        height="20"
       >
-        {isListening ? "Stop" : "Start"} Spraak
-      </button>
-      {interimText && <div className="interim-text">{interimText}</div>}
-    </div>
+        <path d="M12 14a3 3 0 003-3V5a3 3 0 00-6 0v6a3 3 0 003 3zm5-3a5 5 0 01-10 0H5a7 7 0 0014 0h-2zm-5 8a7.001 7.001 0 006.938-6H18a5.978 5.978 0 01-2.197 4.65A5.978 5.978 0 0112 19v2h-2v-2a7.001 7.001 0 006.938-6H18a5.978 5.978 0 01-2.197 4.65A5.978 5.978 0 0112 19v2h-2v-2z" />
+      </svg>
+    </button>
   );
 };
 

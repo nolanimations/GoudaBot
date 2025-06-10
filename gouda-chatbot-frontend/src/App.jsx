@@ -161,10 +161,8 @@ function App() {
     <div className="app-container">
       <div className="header-bar">
         <img src="/logo.png" alt="Gouda Logo" className="logo" />
-        <span className="header-title">Gouda Chatbot</span>
+        <span className={`header-title ${useAltFont ? 'alt-font' : ''}`}>Gouda Chatbot</span>
       </div>
-
-      <h1 style={{ color: 'var(--text-header)' }}>Waar kan ik je mee helpen?</h1>
 
       <ChatWindow
         messages={messages}
@@ -181,12 +179,6 @@ function App() {
         isLoading={isLoading}
         useAltFont={useAltFont}
         onToggleFont={handleToggleFont}
-      />
-      <SpeechToTextInput
-        isDisabled={isLoading}
-        onTranscription={(transcribedText) =>
-          setCurrentInput((prev) => (prev + " " + transcribedText).trim())
-        }
       />
     </div>
   );
