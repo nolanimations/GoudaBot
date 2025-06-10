@@ -3,13 +3,17 @@
   border-radius: 8px;
   padding: 25px 35px;
   width: 100%;
-  max-width: 850px; /* Max width */
-  height: 90vh; /* Max height relative to viewport */
-  max-height: 900px; /* Absolute max height */
+  max-width: 850px;
+  /* Max width */
+  height: 90vh;
+  /* Max height relative to viewport */
+  max-height: 900px;
+  /* Absolute max height */
   display: flex;
   flex-direction: column;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-  overflow: hidden; /* Prevent content spillover */
+  overflow: hidden;
+  /* Prevent content spillover */
 }
 
 h1 {
@@ -22,9 +26,37 @@ h1 {
 }
 
 .error-message {
-    color: var(--error-color);
-    text-align: center;
-    padding: 5px 0;
-    font-size: 0.9em;
-    min-height: 20px; /* Reserve space */
+  color: var(--error-color);
+  text-align: center;
+  padding: 5px 0;
+  font-size: 0.9em;
+  min-height: 20px;
+  /* Reserve space */
 }
+
+.header-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* logo links, tekst rechts */
+  align-items: center;
+  padding: auto;
+  background-color: #005b96; /* lichtere blauwe kleur */
+}
+
+.logo {
+  height: 80px;
+  width: auto;
+  margin-left: 20px;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-family: 'Agrandir', sans-serif;
+  color: #ffffff;
+  margin-right: 30px; 
+}
+.alt-font {
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+}
+
+

@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
 import './ChatWindow.css';
 
-function ChatWindow({ messages, streamingMessage }) {
+function ChatWindow({ messages, streamingMessage, fontClass }) {
   const chatEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -16,7 +16,7 @@ function ChatWindow({ messages, streamingMessage }) {
   // console.log(`[ChatWindow Render] Count=${messages.length}, Streaming=${!!streamingMessage}, LastMsgID=${messages[messages.length - 1]?.id}, StreamingID=${streamingMessage?.id}`);
 
   return (
-    <div className="chat-window">
+    <div className={`chat-window ${fontClass}`}>
       {messages.map((msg) => (
         <MessageBubble key={msg.id} sender={msg.sender} text={msg.text} />
       ))}

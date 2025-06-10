@@ -18,6 +18,25 @@ openai.api_key = os.getenv("OPENAI_API_KEY") or ""
 _ASSISTANT_CACHE_FILE = ".assistant_id"
 _VECTOR_ID = os.getenv("VECTOR_STORE_ID")
 
+ROOT_DIR = os.getcwd()
+INSTRUCTIONS_PATH = os.path.join(ROOT_DIR, "instructions.txt")
+
+if os.path.exists(INSTRUCTIONS_PATH):
+    with open(INSTRUCTIONS_PATH, "r", encoding="utf-8") as f:
+        DEFAULT_CUSTOM_INSTRUCTIONS = f.read().strip()
+else:
+    DEFAULT_CUSTOM_INSTRUCTIONS = (
+        "Je bent een behulpzame AI-assistent gespecialiseerd in activiteiten en "
+        "revalidatiemogelijkheden in Gouda, Nederland. Reageer vriendelijk en "
+        "informatief. Geef in je antwoord website-links mee als je naar een instantie refereert. "
+        "Geef alleen de rauwe data terug zoals je het krijgt."
+    )
+
+print("Looking for instructions at:", INSTRUCTIONS_PATH)
+print("File exists?", os.path.exists(INSTRUCTIONS_PATH))
+print("Contents start with:", repr(DEFAULT_CUSTOM_INSTRUCTIONS[:60]))
+
+
 def _get_or_create_assistant() -> str:
     """Ensure an assistant exists with file_search tool connected to the vector store, and return its ID."""
     # Use cached assistant ID if available
@@ -30,11 +49,7 @@ def _get_or_create_assistant() -> str:
     # Create a new assistant with file_search tool enabled and linked to the vector store
     assistant = openai.beta.assistants.create(
         name="Gouda Activity Bot",
-        instructions=(
-            "Je bent een behulpzame AI‑assistent gespecialiseerd in activiteiten en "
-            "revalidatiemogelijkheden in Gouda, Nederland. Reageer vriendelijk en "
-            "informatief. Geef in je antwoord website‑links mee als je naar een instantie refereert. Geef de namen van de data-bestanden NIET mee in je antwoord."
-        ),
+        instructions=DEFAULT_CUSTOM_INSTRUCTIONS,
         model="gpt-4o",
         tools=[{"type": "file_search"}],
         tool_resources={"file_search": {"vector_store_ids": [_VECTOR_ID]}}
@@ -70,12 +85,7 @@ class SessionManager:
 class ChatSession:
     """Keeps track of custom instructions, local history, and the OpenAI thread ID."""
     def __init__(self, custom_instructions: str | None = None):
-        self.custom_instructions: str = custom_instructions or (
-            "Je bent een behulpzame AI-assistent gespecialiseerd in activiteiten en "
-            "revalidatiemogelijkheden in Gouda, Nederland. Reageer vriendelijk en "
-            "informatief. Geef in je antwoord ook website links mee als je naar een instantie refereert. "
-            "Geef alleen de rauwe data terug zoals je het krijgt."
-        )
+        self.custom_instructions: str = custom_instructions or DEFAULT_CUSTOM_INSTRUCTIONS
         self.history: list[dict] = []      # local log of messages (optional, not sent to API)
         self.thread_id: str | None = None  # OpenAI Thread ID for this session
 

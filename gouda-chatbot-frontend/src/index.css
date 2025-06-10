@@ -1,39 +1,48 @@
 /* Global styles and CSS variables */
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Agrandir, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark; /* Enable dark mode based on OS preference */
+  color-scheme: light;
 
-  color: rgba(255, 255, 255, 0.87); /* Default text color for dark mode */
-  background-color: #242424; /* Default background for dark mode */
+  color: #212121; /* Donkere tekst voor licht thema */
+  background-color: #ffffff; /* Witte achtergrond */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Custom Variables */
-  --background-primary: #212121; /* Main background */
-  --background-secondary: #333; /* Container background */
-  --background-tertiary: #424242; /* Input area, instructions */
-  --background-chatbox: #2a2a2a; /* Chatbox background */
-  --background-input: #555; /* Textarea background */
-  --text-primary: #e0e0e0; /* Primary text */
-  --text-secondary: #bdbdbd; /* Secondary text (labels, placeholders) */
-  --text-light: #ffffff;
-  --border-color: #444;
-  --border-color-input: #666;
-  --user-message-bg: #0b57d0; /* User message bubble */
-  --bot-message-bg: #4a4a4a;  /* Bot message bubble */
-  --button-bg: #5c5c5c;
-  --button-hover-bg: #6f6f6f;
-  --button-disabled-bg: #444;
-  --error-color: #ff8a80;
+  /* Custom Variables – Lichte kleuren */
+  --background-primary: #f9f9f9;
+  --background-secondary: #ffffff;
+  --background-tertiary: #005b96;
+  --background-chatbox: #ffffff;
+  --background-input: #ffffff;
+
+  --text-primary: #4b4a4a;  /* Kleur voor chatbot tekst*/
+  --text-secondary: #ffffff; /* Kleur voor stel een vraag tekst*/
+  --text-header: #000000; /* Voor 'Waar kan ik je mee helpen?' KAN EVENTUEEL WEG WORDEN GEHAALD*/
+  --text-send-icon: #005b96; /* Voor het pijltje */
+
+
+  --text-light: #4b4a4a;
+
+  --border-color: #dddddd;
+  --border-color-input: #cccccc;
+
+  --user-message-bg: #a8d5ba; /* Lichtblauw voor gebruiker */
+  --bot-message-bg: #f1f1f1;  /* Lichtgrijs voor bot */
+
+  --button-bg: #005b96; /* Gouda blauw */
+  --button-hover-bg: #1565c0;
+  --button-disabled-bg: #cccccc;
+
+  --error-color: #d32f2f;
 }
 
-/* Apply dark theme by default */
+/* Body styles */
 body {
   margin: 0;
   display: flex;
@@ -42,20 +51,20 @@ body {
   min-height: 100vh;
   background-color: var(--background-primary);
   color: var(--text-primary);
-  font-size: 16px; /* Base font size */
+  font-size: 16px;
 }
 
 #root {
   width: 100%;
-  height: 100vh; /* Make root take full viewport height */
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px; /* Add some padding around the container */
+  padding: 20px;
   box-sizing: border-box;
 }
 
-/* Scrollbar styling (optional but nice) */
+/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -72,19 +81,17 @@ body {
   background-color: var(--button-hover-bg);
 }
 
-
 /* Blinking cursor animation */
 @keyframes blink {
   50% { opacity: 0; }
 }
-
 .blinking-cursor::after {
   content: '▋';
   display: inline-block;
   animation: blink 1s step-start infinite;
   margin-left: 3px;
-  font-size: 1em; /* Match text size */
+  font-size: 1em;
   line-height: 1;
   vertical-align: baseline;
-  color: var(--text-primary); /* Cursor color */
+  color: var(--text-primary);
 }
