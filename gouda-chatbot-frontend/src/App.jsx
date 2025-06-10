@@ -12,7 +12,7 @@ function App() {
   const [messages, setMessages] = useState([
     {
       id: 0,
-      text: "Hallo! Stel je vraag over activiteiten of revalidatie in Gouda.",
+      text: "Hallo! Stel je vraag over activiteiten in Gouda.",
       sender: "bot",
     },
   ]);
@@ -117,10 +117,8 @@ function App() {
       if (!streamId) throw new Error("Geen stream ID ontvangen.");
 
       const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
-      const response = await fetch(streamUrl);
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let done = false;
+      eventSourceRef.current = new EventSource(streamUrl);
+
 
       eventSourceRef.current.onopen = () => console.log("EventSource verbinding geopend.");
 
@@ -139,12 +137,9 @@ function App() {
 
       eventSourceRef.current.onerror = (err) => {
         console.error("EventSource error:", err);
-        if (eventSourceRef.current?.readyState === EventSource.CLOSED) {
-          if (!streamCompletedRef.current) finalizeStream(false);
-          return;
-        }
+        finalizeStream(true);
+
       }
-      finalizeStream(false);
     } catch (err) {
       console.error("Fout in handleSendMessage:", err);
       setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
