@@ -10,3 +10,7 @@
     flex-direction: column;
     gap: 12px; /* Spacing between messages */
   }
+.alt-font {
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+}
+
