@@ -152,16 +152,35 @@
   }
   
   /* --- Blinking Cursor for Streaming --- */
-  .message-bubble.streaming::after {
-    content: '▋';
-    display: inline-block;
-    animation: blink 1s step-start infinite;
-    margin-left: 3px;
-    vertical-align: baseline;
-    color: inherit;
-    font-weight: 300;
-  }
+
   
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
+  /* Loading bubble: visually identical to a bot message bubble */
+.loading-dots-bubble {
+  padding: 8px 15px;
+  border-radius: 18px;
+  max-width: 80%;
+  line-height: 1.45;
+  word-wrap: break-word;
+  position: relative;
+  color: var(--text-primary);
+  background-color: var(--bot-message-bg);
+  margin-right: auto;
+  border-bottom-left-radius: 5px;
+  /* Optional: add box-shadow if your bubbles have it */
+  /* box-shadow: 0 1px 3px rgba(0,0,0,0.04); */
+}
+
+/* Loading dots animation */
+.loading-dots {
+  display: inline-block;
+  letter-spacing: 2px;
+}
+.loading-dots span {
+  animation: blink 1.4s infinite both;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0; }
+  40% { opacity: 1; }
+}
