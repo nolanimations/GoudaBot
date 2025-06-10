@@ -1,6 +1,7 @@
-from flask import Blueprint, request, jsonify, Response, current_app
+from flask import Blueprint, request, jsonify, Response, current_app, stream_with_context
 import asyncio
 import uuid
+
 
 chat_controller = Blueprint('chat_controller', __name__, url_prefix='/api/chat')
 
@@ -47,10 +48,16 @@ def get_chat_stream(stream_id):
     def event_stream():
         for chunk in chunk_generator:
             formatted_chunk = chunk.replace("\n", "<br>")
-            yield f"data: {formatted_chunk}\n\n"
-        yield "event: close\ndata: Stream finished.\n\n"
+            yield formatted_chunk  # No SSE wrapping!
+    headers = {
+        "Cache-Control": "no-cache",
+        "X-Accel-Buffering": "no",  # For nginx, if used
+        "Content-Type": "application/octet-stream",
+        "Connection": "keep-alive",
+        "Transfer-Encoding": "chunked"
+    }
 
-    return Response(event_stream(), mimetype="text/event-stream")
+    return Response(stream_with_context(event_stream()), headers=headers)
 
 @chat_controller.route('/speech-to-text', methods=['POST'])
 def speech_to_text():

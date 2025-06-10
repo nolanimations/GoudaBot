@@ -78,79 +78,67 @@ function App() {
   }, [closeEventSource]);
 
   const handleSendMessage = useCallback(async () => {
-    const userMessageText = currentInput.trim();
-    if (!userMessageText || isLoading) return;
+      const userMessageText = currentInput.trim();
+      if (!userMessageText || isLoading) return;
 
-    setError(null);
-    closeEventSource();
-    streamCompletedRef.current = false;
-    currentStreamTextRef.current = '';
-
-    const newUserMessage = {
-      id: Date.now(),
-      text: userMessageText,
-      sender: "user",
-    };
-    setMessages((prev) => [...prev, newUserMessage]);
-    setCurrentInput("");
-    setIsLoading(true);
-
-    const streamingId = Date.now() + 1;
-    currentStreamIdRef.current = streamingId;
-    setStreamingMessageDisplay({ id: streamingId, text: '', sender: 'bot' });
-
-    try {
-      const requestBody = {
-        sessionId,
-        message: userMessageText,
-        customInstructions: customInstructions.trim() || null
-      };
-
-      const initiateResponse = await fetch(`${API_BASE_URL}/api/chat/initiate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-
-      if (!initiateResponse.ok) throw new Error(`Server error initiating stream: ${initiateResponse.status}`);
-      const { streamId } = await initiateResponse.json();
-      if (!streamId) throw new Error("Geen stream ID ontvangen.");
-
-      const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
-      eventSourceRef.current = new EventSource(streamUrl);
-
-
-      eventSourceRef.current.onopen = () => console.log("EventSource verbinding geopend.");
-
-      eventSourceRef.current.onmessage = (event) => {
-        currentStreamTextRef.current += event.data;
-        setStreamingMessageDisplay(prev => ({
-          ...prev,
-          text: currentStreamTextRef.current
-        }));
-      };
-
-      eventSourceRef.current.addEventListener('close', (event) => {
-        console.log('Stream gesloten door server:', event.data);
-        finalizeStream(false);
-      });
-
-      eventSourceRef.current.onerror = (err) => {
-        console.error("EventSource error:", err);
-        finalizeStream(true);
-
-      }
-    } catch (err) {
-      console.error("Fout in handleSendMessage:", err);
-      setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
-      setIsLoading(false);
-      setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
-      currentStreamIdRef.current = null;
-      currentStreamTextRef.current = '';
+      setError(null);
       closeEventSource();
-      streamCompletedRef.current = true;
-    }
-  }, [currentInput, isLoading, sessionId, customInstructions, closeEventSource, finalizeStream]);
+      streamCompletedRef.current = false;
+      currentStreamTextRef.current = '';
+
+      const newUserMessage = { id: Date.now(), text: userMessageText, sender: 'user' };
+      setMessages(prev => [...prev, newUserMessage]);
+      setCurrentInput('');
+      setIsLoading(true);
+
+      const streamingId = Date.now() + 1;
+      currentStreamIdRef.current = streamingId;
+
+      try {
+        const requestBody = { sessionId, message: userMessageText, customInstructions: customInstructions.trim() || null };
+        const initiateResponse = await fetch(`${API_BASE_URL}/api/chat/initiate`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(requestBody)
+        });
+        if (!initiateResponse.ok) throw new Error(`Server error initiating stream: ${initiateResponse.status}`);
+        const { streamId } = await initiateResponse.json();
+        if (!streamId) throw new Error("Did not receive a valid stream ID.");
+
+        const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
+        const response = await fetch(streamUrl);
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let done = false;
+
+        currentStreamTextRef.current = '';
+        setStreamingMessageDisplay({ id: streamingId, text: '', sender: 'bot' });
+
+        while (!done) {
+          const { value, done: streamDone } = await reader.read();
+          done = streamDone;
+          if (value) {
+            const chunk = decoder.decode(value, { stream: true });
+            currentStreamTextRef.current += chunk;
+            setStreamingMessageDisplay(prev => ({
+              ...prev,
+              text: currentStreamTextRef.current
+            }));
+          }
+        }
+        finalizeStream(false);
+
+      } catch (err) {
+        console.error("Error in handleSendMessage:", err);
+        setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
+        setIsLoading(false);
+        setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
+        currentStreamIdRef.current = null;
+        currentStreamTextRef.current = '';
+        closeEventSource();
+        streamCompletedRef.current = true;
+      }
+    }, [currentInput, isLoading, sessionId, customInstructions, closeEventSource, finalizeStream]);
 
   return (
     <div className="app-container">
