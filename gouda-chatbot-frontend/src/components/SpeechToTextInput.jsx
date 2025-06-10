@@ -92,7 +92,7 @@ const SpeechToTextInput = ({
 
   return (
     <button
-      className="audio-button"
+      className={`mic-button ${isListening ? "listening" : ""}`}
       onClick={toggleListening}
       disabled={isDisabled}
       title="Klik om spraak naar tekst te starten of stoppen"

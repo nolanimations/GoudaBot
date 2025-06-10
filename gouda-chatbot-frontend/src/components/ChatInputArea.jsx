@@ -51,6 +51,7 @@ function ChatInputArea({
         }}
         disabled={isLoading || !inputValue.trim()}
         className="send-button"
+        title="Verzend bericht"
         aria-label="Verzend bericht"
       >
         <svg
