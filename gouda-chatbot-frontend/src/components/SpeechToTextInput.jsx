@@ -5,6 +5,8 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
   const [isListening, setIsListening] = useState(false);
   const [interimText, setInterimText] = useState("");
   const recognitionRef = useRef(null);
+  const manuallyStoppedRef = useRef(false);
+  const silenceTimerRef = useRef(null);
 
   useEffect(() => {
     const SpeechRecognition =
@@ -21,6 +23,7 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
     recognition.continuous = false;
 
     recognition.onresult = (event) => {
+      clearTimeout(silenceTimerRef.current);
       let transcript = "";
       for (let i = event.resultIndex; i < event.results.length; i++) {
         transcript += event.results[i][0].transcript;
@@ -28,8 +31,10 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
 
       if (event.results[0].isFinal) {
         onTranscription(transcript.trim());
-        setIsListening(false);
         setInterimText("");
+        silenceTimerRef.current = setTimeout(() => {
+          stopRecognition();
+        }, 4000); // Stop after 4 seconds of silence
       } else {
         setInterimText(transcript);
       }
@@ -37,22 +42,35 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
-      setIsListening(false);
+      stopRecognition();
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      if (!manuallyStoppedRef.current) {
+        recognition.start();
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = recognition;
   }, [onTranscription]);
 
+  const stopRecognition = () => {
+    manuallyStoppedRef.current = true;
+    recognitionRef.current?.stop();
+    setIsListening(false);
+    setInterimText("");
+    clearTimeout(silenceTimerRef.current);
+  };
+
   const toggleListening = () => {
     if (isDisabled) return;
 
     if (isListening) {
-      recognitionRef.current?.stop();
+      stopRecognition();
     } else {
+      manuallyStoppedRef.current = false;
       setInterimText("");
       recognitionRef.current?.start();
       setIsListening(true);
