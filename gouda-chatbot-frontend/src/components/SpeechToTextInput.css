@@ -28,3 +28,11 @@
 .mic-button svg {
   color: var(--text-send-icon);
 }
+
+.mic-button.listening {
+  background-color: red;
+}
+
+.mic-button.listening svg {
+  color: var(--text-listening-icon);
+}
