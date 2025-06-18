@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./SpeechToTextInput.css";
 
 const SpeechToTextInput = ({
@@ -44,13 +44,15 @@ const SpeechToTextInput = ({
       }
 
       if (final) {
+        console.log("transcription:", final.trim());
         if (onTranscription) onTranscription(final.trim());
         if (onInterimText) onInterimText(""); // Clear interim after commit
 
         // Wait 3 seconds before stopping if no more input
         silenceTimerRef.current = setTimeout(() => {
+          console.log("Stopping recognition due to silence");
           stopRecognition();
-        }, 3000);
+        }, 3000); // 3 seconds to allow for quick follow-up speech
       }
     };
 
@@ -64,6 +66,7 @@ const SpeechToTextInput = ({
         recognition.start(); // auto-restart if not manually stopped
       } else {
         setIsListening(false);
+        console.log("Recognition stopped manually.");
       }
     };
 
@@ -82,8 +85,10 @@ const SpeechToTextInput = ({
     if (isDisabled) return;
 
     if (isListening) {
+      console.log("Mic button clicked, stopping speech recognition.");
       stopRecognition();
     } else {
+      console.log("Mic button clicked, starting speech recognition.");
       manuallyStoppedRef.current = false;
       recognitionRef.current?.start();
       setIsListening(true);

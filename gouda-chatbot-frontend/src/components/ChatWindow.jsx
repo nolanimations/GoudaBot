@@ -1,6 +1,6 @@
-import React, { useEffect, useRef } from 'react';
-import MessageBubble from './MessageBubble';
-import './ChatWindow.css';
+import React, { useEffect, useRef } from "react";
+import MessageBubble from "./MessageBubble";
+import "./ChatWindow.css";
 
 function ChatWindow({ messages, streamingMessage, fontClass, isLoading }) {
   const chatEndRef = useRef(null);
@@ -22,7 +22,9 @@ function ChatWindow({ messages, streamingMessage, fontClass, isLoading }) {
       {isLoading && !streamingMessage && (
         <div className="loading-dots-bubble">
           <span className="loading-dots">
-            <span>.</span><span>.</span><span>.</span>
+            <span>.</span>
+            <span>.</span>
+            <span>.</span>
           </span>
         </div>
       )}

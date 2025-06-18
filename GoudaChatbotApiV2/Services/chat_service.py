@@ -127,6 +127,8 @@ class ChatService:
         # 2. Ensure a conversation thread exists for this session, then post the user message to it
         thread_id = self._ensure_thread(session)
         user_message = request['message']
+        print(f"[CHAT] Streaming initiaed for session {request['session_id']}. User message: {user_message}")
+
         openai.beta.threads.messages.create(
             thread_id=thread_id,
             role="user",
@@ -147,18 +149,21 @@ class ChatService:
         def chunk_generator():
             full_parts: list[str] = []
 
-            for event in run:
-                if event.event == "thread.message.delta":
-                    pieces = []
-                    for block in event.data.delta.content or []:
-                        if getattr(block, "type", None) == "text":
-                            pieces.append(block.text.value)
-                    chunk_text = "".join(pieces)
+            try:
+                for event in run:
+                    if event.event == "thread.message.delta":
+                        pieces = []
+                        for block in event.data.delta.content or []:
+                            if getattr(block, "type", None) == "text":
+                                pieces.append(block.text.value)
+                        chunk_text = "".join(pieces)
 
-                    if chunk_text:
-                        cleaned = re.sub(r'【\d+:\d+†[^】]+】', '', chunk_text)
-                        full_parts.append(cleaned)
-                        yield cleaned
+                        if chunk_text:
+                            cleaned = re.sub(r'【\d+:\d+†[^】]+】', '', chunk_text)
+                            full_parts.append(cleaned)
+                            yield cleaned
+            except Exception as e:
+                print(f"[ERROR] Exception while streaming response: {e}")
 
             full_text = "".join(full_parts).strip()
             if full_text:
