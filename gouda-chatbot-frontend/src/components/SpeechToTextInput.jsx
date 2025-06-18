@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./SpeechToTextInput.css";
 
-const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
+const SpeechToTextInput = ({
+  onTranscription,
+  onInterimText,
+  isDisabled = false,
+}) => {
   const [isListening, setIsListening] = useState(false);
-  const [interimText, setInterimText] = useState("");
   const recognitionRef = useRef(null);
+  const manuallyStoppedRef = useRef(false);
+  const silenceTimerRef = useRef(null);
 
   useEffect(() => {
     const SpeechRecognition =
@@ -16,44 +21,70 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
     }
 
     const recognition = new SpeechRecognition();
-    recognition.lang = "nl-NL"; // or 'en-US', 'it-IT', etc.
+    recognition.lang = "nl-NL";
     recognition.interimResults = true;
     recognition.continuous = false;
 
     recognition.onresult = (event) => {
-      let transcript = "";
+      clearTimeout(silenceTimerRef.current);
+      let interim = "";
+      let final = "";
+
       for (let i = event.resultIndex; i < event.results.length; i++) {
-        transcript += event.results[i][0].transcript;
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          final += transcript + " ";
+        } else {
+          interim += transcript;
+        }
       }
 
-      if (event.results[0].isFinal) {
-        onTranscription(transcript.trim());
-        setIsListening(false);
-        setInterimText("");
-      } else {
-        setInterimText(transcript);
+      if (interim && onInterimText) {
+        onInterimText(interim.trim());
+      }
+
+      if (final) {
+        if (onTranscription) onTranscription(final.trim());
+        if (onInterimText) onInterimText(""); // Clear interim after commit
+
+        // Wait 3 seconds before stopping if no more input
+        silenceTimerRef.current = setTimeout(() => {
+          stopRecognition();
+        }, 3000);
       }
     };
 
     recognition.onerror = (event) => {
       console.error("Speech recognition error:", event.error);
-      setIsListening(false);
+      stopRecognition();
     };
 
     recognition.onend = () => {
-      setIsListening(false);
+      if (!manuallyStoppedRef.current) {
+        recognition.start(); // auto-restart if not manually stopped
+      } else {
+        setIsListening(false);
+      }
     };
 
     recognitionRef.current = recognition;
-  }, [onTranscription]);
+  }, [onTranscription, onInterimText]);
+
+  const stopRecognition = () => {
+    manuallyStoppedRef.current = true;
+    recognitionRef.current?.stop();
+    setIsListening(false);
+    clearTimeout(silenceTimerRef.current);
+    if (onInterimText) onInterimText(""); // Clear display
+  };
 
   const toggleListening = () => {
     if (isDisabled) return;
 
     if (isListening) {
-      recognitionRef.current?.stop();
+      stopRecognition();
     } else {
-      setInterimText("");
+      manuallyStoppedRef.current = false;
       recognitionRef.current?.start();
       setIsListening(true);
     }
@@ -61,7 +92,7 @@ const SpeechToTextInput = ({ onTranscription, isDisabled = false }) => {
 
   return (
     <button
-      className="audio-button"
+      className={`mic-button ${isListening ? "listening" : ""}`}
       onClick={toggleListening}
       disabled={isDisabled}
       title="Klik om spraak naar tekst te starten of stoppen"

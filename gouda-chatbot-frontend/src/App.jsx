@@ -151,6 +151,7 @@ function App() {
         messages={messages}
         streamingMessage={streamingMessageDisplay.id ? streamingMessageDisplay : null}
         fontClass={useAltFont ? 'alt-font' : ''}
+        isLoading={isLoading}
       />
 
       {error && <div className="error-message">{error}</div>}
