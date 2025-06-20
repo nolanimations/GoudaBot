@@ -1,8 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import ChatWindow from "./components/ChatWindow";
-import InstructionsInput from "./components/InstructionsInput";
 import ChatInputArea from "./components/ChatInputArea";
-import SpeechToTextInput from "./components/SpeechToTextInput";
 import "./App.css";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -22,10 +20,14 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const [streamingMessageDisplay, setStreamingMessageDisplay] = useState({ id: null, text: '', sender: 'bot' });
+  const [streamingMessageDisplay, setStreamingMessageDisplay] = useState({
+    id: null,
+    text: "",
+    sender: "bot",
+  });
 
   const currentStreamIdRef = useRef(null);
-  const currentStreamTextRef = useRef('');
+  const currentStreamTextRef = useRef("");
   const streamCompletedRef = useRef(false);
   const eventSourceRef = useRef(null);
 
@@ -33,7 +35,7 @@ function App() {
   const [useAltFont, setUseAltFont] = useState(false);
 
   const handleToggleFont = () => {
-    setUseAltFont(prev => !prev);
+    setUseAltFont((prev) => !prev);
   };
 
   const closeEventSource = useCallback(() => {
@@ -44,113 +46,162 @@ function App() {
     }
   }, []);
 
-  const finalizeStream = useCallback((isError = false, errorMessage = "[Verbinding verbroken]") => {
-    if (streamCompletedRef.current) return;
+  const finalizeStream = useCallback(
+    (isError = false, errorMessage = "[Verbinding verbroken]") => {
+      if (streamCompletedRef.current) return;
 
-    streamCompletedRef.current = true;
-    const finalMessageId = currentStreamIdRef.current;
-    const finalMessageText = currentStreamTextRef.current;
+      streamCompletedRef.current = true;
+      const finalMessageId = currentStreamIdRef.current;
+      const finalMessageText = currentStreamTextRef.current;
 
-    closeEventSource();
-    setIsLoading(false);
-    setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
-    currentStreamIdRef.current = null;
-    currentStreamTextRef.current = '';
+      console.log(
+        `Finalizing stream. Error: ${isError}, Message ID: ${finalMessageId}`
+      );
 
-    if (finalMessageId && finalMessageText) {
-      const messageToAdd = {
-        id: finalMessageId,
-        text: isError ? `${finalMessageText} ${errorMessage}` : finalMessageText,
-        sender: 'bot'
-      };
-      setMessages(prev => {
-        if (prev.some(msg => msg.id === messageToAdd.id)) return prev;
-        return [...prev, messageToAdd];
-      });
-    }
-  }, [closeEventSource]);
+      closeEventSource();
+      setIsLoading(false);
+      setStreamingMessageDisplay({ id: null, text: "", sender: "bot" });
+      currentStreamIdRef.current = null;
+      currentStreamTextRef.current = "";
+
+      if (finalMessageId && finalMessageText) {
+        const messageToAdd = {
+          id: finalMessageId,
+          text: isError
+            ? `${finalMessageText} ${errorMessage}`
+            : finalMessageText,
+          sender: "bot",
+        };
+        setMessages((prev) => {
+          if (prev.some((msg) => msg.id === messageToAdd.id)) return prev;
+          return [...prev, messageToAdd];
+        });
+      }
+    },
+    [closeEventSource]
+  );
 
   useEffect(() => {
     return () => {
+      console.log("Cleaning up on component unmount.");
       streamCompletedRef.current = false;
       closeEventSource();
     };
   }, [closeEventSource]);
 
   const handleSendMessage = useCallback(async () => {
-      const userMessageText = currentInput.trim();
-      if (!userMessageText || isLoading) return;
+    const userMessageText = currentInput.trim();
+    if (!userMessageText || isLoading) return;
 
-      setError(null);
-      closeEventSource();
-      streamCompletedRef.current = false;
-      currentStreamTextRef.current = '';
+    console.log(`handleSendMessage called with input: "${userMessageText}"`);
 
-      const newUserMessage = { id: Date.now(), text: userMessageText, sender: 'user' };
-      setMessages(prev => [...prev, newUserMessage]);
-      setCurrentInput('');
-      setIsLoading(true);
+    setError(null);
+    closeEventSource();
+    streamCompletedRef.current = false;
+    currentStreamTextRef.current = "";
 
-      const streamingId = Date.now() + 1;
-      currentStreamIdRef.current = streamingId;
+    const newUserMessage = {
+      id: Date.now(),
+      text: userMessageText,
+      sender: "user",
+    };
+    setMessages((prev) => [...prev, newUserMessage]);
+    setCurrentInput("");
+    setIsLoading(true);
 
-      try {
-        const requestBody = { sessionId, message: userMessageText, customInstructions: customInstructions.trim() || null };
-        const initiateResponse = await fetch(`${API_BASE_URL}/api/chat/initiate`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(requestBody)
-        });
-        if (!initiateResponse.ok) throw new Error(`Server error initiating stream: ${initiateResponse.status}`);
-        const { streamId } = await initiateResponse.json();
-        if (!streamId) throw new Error("Did not receive a valid stream ID.");
+    const streamingId = Date.now() + 1;
+    currentStreamIdRef.current = streamingId;
 
-        const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
-        const response = await fetch(streamUrl);
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let done = false;
+    try {
+      const requestBody = {
+        sessionId,
+        message: userMessageText,
+        customInstructions: customInstructions.trim() || null,
+      };
+      console.log(
+        `Sending POST to ${API_URL}/initiate with body:`,
+        requestBody
+      );
 
-        currentStreamTextRef.current = '';
-        setStreamingMessageDisplay({ id: streamingId, text: '', sender: 'bot' });
-
-        while (!done) {
-          const { value, done: streamDone } = await reader.read();
-          done = streamDone;
-          if (value) {
-            const chunk = decoder.decode(value, { stream: true });
-            currentStreamTextRef.current += chunk;
-            setStreamingMessageDisplay(prev => ({
-              ...prev,
-              text: currentStreamTextRef.current
-            }));
-          }
+      const initiateResponse = await fetch(
+        `${API_BASE_URL}/api/chat/initiate`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestBody),
         }
-        finalizeStream(false);
+      );
+      if (!initiateResponse.ok)
+        throw new Error(
+          `Server error initiating stream: ${initiateResponse.status}`
+        );
+      const { streamId } = await initiateResponse.json();
 
-      } catch (err) {
-        console.error("Error in handleSendMessage:", err);
-        setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
-        setIsLoading(false);
-        setStreamingMessageDisplay({ id: null, text: '', sender: 'bot' });
-        currentStreamIdRef.current = null;
-        currentStreamTextRef.current = '';
-        closeEventSource();
-        streamCompletedRef.current = true;
+      console.log(`Received stream ID: ${streamId}`);
+
+      if (!streamId) throw new Error("Did not receive a valid stream ID.");
+
+      const streamUrl = `${API_BASE_URL}/api/chat/stream/${streamId}`;
+      console.log(`Connecting to stream URL: ${streamUrl}`);
+      const response = await fetch(streamUrl);
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      currentStreamTextRef.current = "";
+      setStreamingMessageDisplay({ id: streamingId, text: "", sender: "bot" });
+
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        done = streamDone;
+        if (value) {
+          const chunk = decoder.decode(value, { stream: true });
+          console.log(`Received chunk from stream: ${chunk}`);
+          currentStreamTextRef.current += chunk;
+          setStreamingMessageDisplay((prev) => ({
+            ...prev,
+            text: currentStreamTextRef.current,
+          }));
+        }
       }
-    }, [currentInput, isLoading, sessionId, customInstructions, closeEventSource, finalizeStream]);
+      console.log(
+        `Stream finished. Final text: "${currentStreamTextRef.current}"`
+      );
+      finalizeStream(false);
+    } catch (err) {
+      console.error("Error in handleSendMessage:", err);
+      setError(`Fout: ${err.message || "Kan bericht niet verzenden."}`);
+      setIsLoading(false);
+      setStreamingMessageDisplay({ id: null, text: "", sender: "bot" });
+      currentStreamIdRef.current = null;
+      currentStreamTextRef.current = "";
+      closeEventSource();
+      streamCompletedRef.current = true;
+    }
+  }, [
+    currentInput,
+    isLoading,
+    sessionId,
+    customInstructions,
+    closeEventSource,
+    finalizeStream,
+  ]);
 
   return (
     <div className="app-container">
       <div className="header-bar">
         <img src="/logo.png" alt="Gouda Logo" className="logo" />
-        <span className={`header-title ${useAltFont ? 'alt-font' : ''}`}>Gouda Chatbot</span>
+        <span className={`header-title ${useAltFont ? "alt-font" : ""}`}>
+          Gouda Chatbot
+        </span>
       </div>
 
       <ChatWindow
         messages={messages}
-        streamingMessage={streamingMessageDisplay.id ? streamingMessageDisplay : null}
-        fontClass={useAltFont ? 'alt-font' : ''}
+        streamingMessage={
+          streamingMessageDisplay.id ? streamingMessageDisplay : null
+        }
+        fontClass={useAltFont ? "alt-font" : ""}
         isLoading={isLoading}
       />
 

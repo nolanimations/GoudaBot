@@ -20,11 +20,14 @@ def initiate_chat_stream():
     custom_instructions = data.get('customInstructions')
 
     if not session_id or not message:
+        print(f"[INITIATE] Invalid request payload: {data}")
         return jsonify({"detail": "Invalid request payload."}), 400
 
     stream_id = uuid.uuid4().hex
     context = StreamContext(session_id, message, custom_instructions)
     cache.set(stream_id, context)
+
+    print(f"[INITIATE] New stream created: {stream_id} (Session: {session_id})")
     return jsonify({"streamId": stream_id})
 
 @chat_controller.route('/stream/<stream_id>', methods=['GET'])
@@ -34,8 +37,10 @@ def get_chat_stream(stream_id):
 
     context = cache.get(stream_id)
     if not context:
+        print(f"[STREAM] No context found for stream ID: {stream_id}")
         return jsonify({"detail": "Invalid or expired stream ID."}), 404
 
+    print(f"[STREAM] Streaming intiated for ID: {stream_id}, Session: {context.session_id}")
     request_data = {
         "session_id": context.session_id,
         "message": context.user_message,
@@ -62,11 +67,13 @@ def get_chat_stream(stream_id):
 @chat_controller.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
     if 'audio' not in request.files:
+        print("[SPEECH-TO-TEXT] No audio file provided.")
         return jsonify({"detail": "No audio file provided"}), 400
     
     audio_file = request.files['audio']
 
     if audio_file.filename == '':
+        print("[SPEECH-TO-TEXT] Empty filename provided.")
         return jsonify({"detail": "Empty filename."}), 400
     
     try:

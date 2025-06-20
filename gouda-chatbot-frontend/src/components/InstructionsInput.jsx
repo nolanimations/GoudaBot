@@ -1,10 +1,12 @@
-import React from 'react';
-import './InstructionsInput.css';
+import React from "react";
+import "./InstructionsInput.css";
 
 function InstructionsInput({ value, onChange, disabled }) {
   return (
     <div className="instructions-container">
-      <label htmlFor="custom-instructions">Custom Instructies (optioneel):</label>
+      <label htmlFor="custom-instructions">
+        Custom Instructies (optioneel):
+      </label>
       <textarea
         id="custom-instructions"
         rows="2" // Start smaller
