@@ -19,4 +19,4 @@ for path in files:
         file_id=f.id
     )
 
-print("Vector Store ID:", store.id)
+print("Vector Store ID:", store.id)

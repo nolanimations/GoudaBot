@@ -2,7 +2,6 @@ import os
 import openai
 from dotenv import load_dotenv
 from threading import Lock
-from flask import current_app
 import re
 
 # ---------------------------------------------------------------------------

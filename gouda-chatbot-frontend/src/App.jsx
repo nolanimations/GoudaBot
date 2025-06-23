@@ -31,7 +31,7 @@ function App() {
   const streamCompletedRef = useRef(false);
   const eventSourceRef = useRef(null);
 
-  // 👇 Nieuw: lettertype wissel logica
+  // Nieuw: lettertype wissel logica
   const [useAltFont, setUseAltFont] = useState(false);
 
   const handleToggleFont = () => {
@@ -46,6 +46,7 @@ function App() {
     }
   }, []);
 
+  // Finalize the stream and update the UI
   const finalizeStream = useCallback(
     (isError = false, errorMessage = "[Verbinding verbroken]") => {
       if (streamCompletedRef.current) return;
@@ -81,6 +82,7 @@ function App() {
     [closeEventSource]
   );
 
+  // Effect to handle cleanup on component unmount
   useEffect(() => {
     return () => {
       console.log("Cleaning up on component unmount.");
@@ -112,6 +114,7 @@ function App() {
     const streamingId = Date.now() + 1;
     currentStreamIdRef.current = streamingId;
 
+    // Start the stream
     try {
       const requestBody = {
         sessionId,

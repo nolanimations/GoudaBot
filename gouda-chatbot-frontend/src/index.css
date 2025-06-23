@@ -6,36 +6,35 @@
 
   color-scheme: light;
 
-  color: #212121; /* Donkere tekst voor licht thema */
-  background-color: #ffffff; /* Witte achtergrond */
+  color: #212121; /* Dark text for light theme */
+  background-color: #ffffff; /* White background */
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  /* Custom Variables – Lichte kleuren */
+  /* Custom Variables – Light colors */
   --background-primary: #f9f9f9;
   --background-secondary: #ffffff;
   --background-tertiary: #005b96;
   --background-chatbox: #ffffff;
   --background-input: #ffffff;
 
-  --text-primary: #4b4a4a;  /* Kleur voor chatbot tekst*/
-  --text-secondary: #ffffff; /* Kleur voor stel een vraag tekst*/
-  --text-header: #000000; /* Voor 'Waar kan ik je mee helpen?' KAN EVENTUEEL WEG WORDEN GEHAALD*/
-  --text-send-icon: #005b96; /* Voor het pijltje */
-
+  --text-primary: #4b4a4a; /* Color for chatbot text */
+  --text-secondary: #ffffff; /* Color for "ask a question" text */
+  --text-header: #000000; /* For 'How can I help you?' */
+  --text-send-icon: #005b96; /* For the arrow icon */
 
   --text-light: #4b4a4a;
 
   --border-color: #dddddd;
   --border-color-input: #cccccc;
 
-  --user-message-bg: #a8d5ba; /* Lichtblauw voor gebruiker */
-  --bot-message-bg: #f1f1f1;  /* Lichtgrijs voor bot */
+  --user-message-bg: #a8d5ba; /* Light blue for user */
+  --bot-message-bg: #f1f1f1; /* Light gray for bot */
 
-  --button-bg: #005b96; /* Gouda blauw */
+  --button-bg: #005b96; /* Gouda blue */
   --button-hover-bg: #1565c0;
   --button-disabled-bg: #cccccc;
 
@@ -83,10 +82,12 @@ body {
 
 /* Blinking cursor animation */
 @keyframes blink {
-  50% { opacity: 0; }
+  50% {
+    opacity: 0;
+  }
 }
 .blinking-cursor::after {
-  content: '▋';
+  content: "▋";
   display: inline-block;
   animation: blink 1s step-start infinite;
   margin-left: 3px;
@@ -95,4 +96,3 @@ body {
   vertical-align: baseline;
   color: var(--text-primary);
 }
-
