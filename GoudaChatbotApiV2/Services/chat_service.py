@@ -2,7 +2,6 @@ import os
 import openai
 from dotenv import load_dotenv
 from threading import Lock
-from flask import current_app
 import re
 
 # ---------------------------------------------------------------------------
@@ -127,7 +126,7 @@ class ChatService:
         # 2. Ensure a conversation thread exists for this session, then post the user message to it
         thread_id = self._ensure_thread(session)
         user_message = request['message']
-        print(f"[CHAT] Streaming initiaed for session {request['session_id']}. User message: {user_message}")
+        print(f"[CHAT] Streaming initiated for session {request['session_id']}. User message: {user_message}")
 
         openai.beta.threads.messages.create(
             thread_id=thread_id,

@@ -24,4 +24,4 @@
 #         for key in expired_keys:
 #             self.cache.pop(key, None)
 
-# Deze shit wordt niet gebruikt...
+# This code is not used in the current implementation, but it can be used to create a simple self made cache manager.

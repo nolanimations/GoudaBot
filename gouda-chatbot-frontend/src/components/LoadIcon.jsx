@@ -1,4 +1,3 @@
-import React from "react";
 import "./MessageBubble.css";
 
 const LoadIcon = () => (

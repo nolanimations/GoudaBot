@@ -1,5 +1,4 @@
 from flask import Blueprint, request, jsonify, Response, current_app, stream_with_context
-import asyncio
 import uuid
 
 
@@ -11,6 +10,7 @@ class StreamContext:
         self.user_message = user_message
         self.custom_instructions = custom_instructions
 
+# This route is used to initiate a chat stream.
 @chat_controller.route('/initiate', methods=['POST'])
 def initiate_chat_stream():
     cache = current_app.cache
@@ -30,6 +30,7 @@ def initiate_chat_stream():
     print(f"[INITIATE] New stream created: {stream_id} (Session: {session_id})")
     return jsonify({"streamId": stream_id})
 
+# This route is used to get the chat stream by stream ID.
 @chat_controller.route('/stream/<stream_id>', methods=['GET'])
 def get_chat_stream(stream_id):
     cache = current_app.cache
@@ -64,6 +65,7 @@ def get_chat_stream(stream_id):
 
     return Response(stream_with_context(event_stream()), headers=headers)
 
+# This route is used to handle speech-to-text conversion.
 @chat_controller.route('/speech-to-text', methods=['POST'])
 def speech_to_text():
     if 'audio' not in request.files:

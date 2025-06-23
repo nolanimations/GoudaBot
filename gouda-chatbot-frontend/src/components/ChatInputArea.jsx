@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import "./ChatInputArea.css";
 import SpeechToTextInput from "./SpeechToTextInput";
 
@@ -13,6 +13,7 @@ function ChatInputArea({
   const textareaRef = useRef(null);
   const [interimSpeech, setInterimSpeech] = useState("");
 
+  // Adjust textarea height based on content and interim speech
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";

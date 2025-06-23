@@ -29,20 +29,6 @@ if not openai.api_key:
 else:
     print("OpenAI API Key configured.")
 
-# --- REMOVE VECTOR STORE CREATION AND FILE UPLOAD AT STARTUP ---
-# The VECTOR_STORE_ID will now be read from environment variables by chat_service.py
-
-# csvFileNames = ["Data/alle_organisaties.txt", "Data/events.txt", "Data/ingouda_onderwerpen.txt"]
-# vector_store = openai.vector_stores.create(name="Gouda Data")
-# app.config['VECTOR_STORE_ID'] = vector_store.id
-#
-# for filename in csvFileNames:
-#     openai.vector_stores.files.upload_and_poll(
-#         vector_store_id=vector_store.id,
-#         file=open(filename, "rb")
-#     )
-# print(f"Vector Store {vector_store.id} configured and files uploaded.") # Optional: Log if you were creating it
-
 # --- Configure Cache ---
 app.config['CACHE_TYPE'] = 'SimpleCache'
 app.config['CACHE_DEFAULT_TIMEOUT'] = 300
