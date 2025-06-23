@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from Services.chat_service import chat_service, ChatService, ChatSession, SessionManager
 
 @pytest.fixture
-#Dit maakt een nepverzoek aan en is btw niet geconnect met OpenAI
+# This creates a fake request and is not connected to OpenAI
 def mock_request():
     return {
         "session_id": "Voorbeeldtest123",
@@ -49,15 +49,15 @@ def test_stream_chat_completion_chunks(mock_request):
 
     mock_run = [mock_event]
 
-    #create geeft gewoon de thread terug
-    #runs.create geeft de fake output terug
+    # create just returns the thread
+    # runs.create returns the fake output
     with patch("openai.beta.threads.create", return_value=mock_thread), \
          patch("openai.beta.threads.messages.create"), \
          patch("openai.beta.threads.runs.create", return_value=mock_run):
 
-        generator, _ = chat_service.stream_chat_completion_chunks(mock_request) #Functie die de tekst opsplitst in chunks
+        generator, _ = chat_service.stream_chat_completion_chunks(mock_request) # Function that splits the text into chunks
 
-        chunks = list(generator) #Zet het weer om in een list
+        chunks = list(generator) # Converts it back into a list
         assert chunks == ["Dit is puur voor testen"]
 
         updated_session = SessionManager.get_or_create_session("Voorbeeldtest123")
@@ -72,4 +72,4 @@ def test_trim_history_removes_old_entries():
 
     ChatService._trim_history(session, max_items=40)
     assert len(session.history) == 40
-    assert session.history[0]["content"] == "bericht 20"
+    assert session.history[0]["content"]

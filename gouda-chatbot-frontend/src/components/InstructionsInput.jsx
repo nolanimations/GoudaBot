@@ -1,4 +1,3 @@
-import React from "react";
 import "./InstructionsInput.css";
 
 function InstructionsInput({ value, onChange, disabled }) {

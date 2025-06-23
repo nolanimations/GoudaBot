@@ -3,6 +3,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "./MessageBubble.css";
 
+// MessageBubble component to display chat messages with Markdown support
 const MessageBubble = React.memo(({ sender, text, isStreaming = false }) => {
   const bubbleClass = `message-bubble ${sender}-message${
     isStreaming ? " streaming" : ""

@@ -11,6 +11,7 @@ const SpeechToTextInput = ({
   const manuallyStoppedRef = useRef(false);
   const silenceTimerRef = useRef(null);
 
+  // Initialize speech recognition when component mounts
   useEffect(() => {
     const SpeechRecognition =
       window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -20,6 +21,7 @@ const SpeechToTextInput = ({
       return;
     }
 
+    // Create a new instance of SpeechRecognition
     const recognition = new SpeechRecognition();
     recognition.lang = "nl-NL";
     recognition.interimResults = true;
@@ -30,6 +32,7 @@ const SpeechToTextInput = ({
       let interim = "";
       let final = "";
 
+      // Process results from the speech recognition
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcript = event.results[i][0].transcript;
         if (event.results[i].isFinal) {
@@ -81,6 +84,7 @@ const SpeechToTextInput = ({
     if (onInterimText) onInterimText(""); // Clear display
   };
 
+  // Toggle listening state when button is clicked
   const toggleListening = () => {
     if (isDisabled) return;
 
